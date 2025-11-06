@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+<title>Contenido</title>
+<style>
+    .btn-agregar {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background-color: #1DB954;
+        color: black;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .miniPlaylists {
+        position: absolute;
+        background-color: #2a2a2a;
+        border-radius: 8px;
+        padding: 5px;
+        display: none;
+        flex-direction: column;
+        z-index: 100;
+    }
+
+    .miniPlaylists button {
+        background: none;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .miniPlaylists button:hover {
+        background-color: #1DB954;
+        color: black;
+    }
+
+    .cancion-wrapper {
+        position: relative;
+        display: inline-block;
+        margin: 10px;
+    }
+
+    #notificacion {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1DB954;
+        color: black;
+        padding: 10px 20px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 999;
+    }
+</style>
+</head>
+<body class="main">
+<h2>Explorar canciones</h2>
+
+<!-- sección en tendencia -->
+<h3>Canciones en tendencia</h3>
+<div id="canciones-tendencia"></div>
+
+<!-- sección de Pop -->
+<h3>Pop</h3>
+<div id="canciones-pop"></div>
+
+<!-- sección de Hip Hop -->
+<h3>Hip Hop</h3>
+<div id="canciones-hiphop"></div>
+
+<!-- sección de Batidas -->
+<h3>Batidas</h3>
+<div id="canciones-batidas"></div>
+
+<div id="notificacion"></div>
+
+<script src="canciones.js"></script>
+<script src="api.js"></script>
+<script>
+function mostrarNotificacion(texto) {
+    const notificacion = document.getElementById("notificacion");
+    notificacion.textContent = texto;
+    notificacion.style.opacity = "1";
+    setTimeout(() => notificacion.style.opacity = "0", 2000);
+}
+
+function generarCanciones(contenedor, canciones) {
+    canciones.forEach(c => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("cancion-wrapper");
+
+        const div = document.createElement("div");
+        div.classList.add("cancion");
+        div.innerHTML = `
+            <img src="${c.thumbnail}" alt="${c.titulo}">
+            <p>${c.titulo}</p>
+        `;
+
+        // Botón + para agregar a playlist
+        const btnAgregar = document.createElement("button");
+        btnAgregar.textContent = "+";
+        btnAgregar.classList.add("btn-agregar");
+
+        // Mini menú playlists
+        const mini = document.createElement("div");
+        mini.classList.add("miniPlaylists");
+
+        btnAgregar.addEventListener("click", async (e) => {
+    // Si ya está abierto, cerralo
+    if (mini.style.display === "flex") {
+        mini.style.display = "none";
+        return;
+    }
+
+    // Limpiar menú antes de llenarlo
+    mini.innerHTML = "";
+
+    try {
+        const res = await api.playlists(); // devuelve { playlists: [...] }
+        const playlists = res.playlists || [];
+        playlists.forEach(pl => {
+
+            const btnPl = document.createElement("button");
+            btnPl.textContent = pl.nombre;
+            btnPl.addEventListener("click", async () => {
+                await api.addSong(pl.id, c); // usa la API para agregar canción
+                mostrarNotificacion(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
+                mini.style.display = "none";
+            });
+            mini.appendChild(btnPl);
+        });
+
+        mini.style.display = "flex";
+        mini.style.top = (e.target.offsetTop + 30) + "px";
+        mini.style.left = e.target.offsetLeft + "px";
+    } catch (err) {
+        console.error("Error cargando playlists:", err);
+        mostrarNotificacion("No se pudieron cargar las playlists");
+    }
+});
+
+        wrapper.appendChild(div);
+        wrapper.appendChild(btnAgregar);
+        wrapper.appendChild(mini);
+
+        // Click normal → reproducir
+        div.addEventListener("click", () => {
+            window.parent.frames['reproductorFrame'].postMessage({ song: c.ruta }, '*');
+        });
+
+        contenedor.appendChild(wrapper);
+    });
+}
+
+// Cargar canciones por sección
+generarCanciones(document.getElementById("canciones-tendencia"), cancionesCatalogo.filter(c => c.seccion === "tendencia"));
+generarCanciones(document.getElementById("canciones-pop"), cancionesCatalogo.filter(c => c.seccion === "pop"));
+generarCanciones(document.getElementById("canciones-hiphop"), cancionesCatalogo.filter(c => c.seccion === "hiphop"));
+generarCanciones(document.getElementById("canciones-batidas"), cancionesCatalogo.filter(c => c.seccion === "batidas"));
+
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Reproductor</title>
+  <style>
+    #tituloCancion {
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .muted { color:#9aa0a6; font-size:12px; text-align:center; margin-top:2px }
+  </style>
+</head>
+<body class="reproductor">
+
+  <div id="tituloCancion">No se está reproduciendo ninguna canción</div>
+  <audio id="audio" controls style="width: 100%;"></audio>
+  <div id="sub" class="muted"></div>
+
+  <!-- catálogo opcional para fallback aleatorio -->
+  <script src="canciones.js"></script>
+
+  <script>
+  (function(){
+    const audio = document.getElementById("audio");
+    const tituloDiv = document.getElementById("tituloCancion");
+    const sub = document.getElementById("sub");
+
+    /** Estado actual **/
+    let currentPlaylist = [];   // [{titulo, artista, ruta, thumbnail?}]
+    let currentIndex = 0;
+    let isPlaylist = false;
+
+    /** Utils **/
+    function fmtTitle(track){
+      const t = (track?.titulo || '(sin título)').trim();
+      const a = (track?.artista || '').trim();
+      return a ? `${t} — ${a}` : t;
+    }
+    function setTitle(track){
+      tituloDiv.textContent = fmtTitle(track);
+      sub.textContent = track?.ruta || '';
+    }
+    function playTrack(track){
+      if (!track || !track.ruta) {
+        tituloDiv.textContent = "Archivo de audio no disponible";
+        sub.textContent = '';
+        return;
+      }
+      try {
+        audio.src = track.ruta;
+        setTitle(track);
+        audio.play().catch(()=>{/* usuario no interactuó aún */});
+      } catch(e){
+        tituloDiv.textContent = "No se pudo reproducir";
+        sub.textContent = '';
+        console.error(e);
+      }
+    }
+    function playFromPlaylist(index){
+      if (!currentPlaylist?.length) return;
+      currentIndex = Math.max(0, Math.min(index, currentPlaylist.length - 1));
+      isPlaylist = true;
+      playTrack(currentPlaylist[currentIndex]);
+    }
+
+    /** Avance al terminar **/
+    audio.addEventListener("ended", () => {
+      if (isPlaylist) {
+        currentIndex++;
+        if (currentIndex < currentPlaylist.length) {
+          playTrack(currentPlaylist[currentIndex]);
+        } else {
+          isPlaylist = false;
+          tituloDiv.textContent = "Fin de la playlist";
+          sub.textContent = '';
+        }
+      } else {
+        // Fallback aleatorio (opcional)
+        if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length) {
+          const rnd = window.cancionesCatalogo[Math.floor(Math.random()*window.cancionesCatalogo.length)];
+          playTrack({ titulo: rnd.titulo, artista: rnd.artista, ruta: rnd.ruta, thumbnail: rnd.thumbnail });
+        } else {
+          tituloDiv.textContent = "No se está reproduciendo ninguna canción";
+          sub.textContent = '';
+        }
+      }
+    });
+
+    /** Si hay error con el archivo, intenta saltar al siguiente en playlist **/
+    audio.addEventListener("error", () => {
+      if (isPlaylist && currentIndex + 1 < currentPlaylist.length) {
+        currentIndex++;
+        playTrack(currentPlaylist[currentIndex]);
+      } else {
+        tituloDiv.textContent = "Error de reproducción";
+        sub.textContent = '';
+      }
+    });
+
+    /** Control por mensajes desde otros frames **/
+    window.addEventListener("message", (e) => {
+      const data = e.data || {};
+      // Reproducción individual (compatibilidad con tu formato anterior)
+      if (data.song) {
+        const path = String(data.song);
+        const track = {
+          ruta: path,
+          titulo: path.split("/").pop().replace(/\.(mp3|wav|ogg)$/i,''),
+          artista: ''
+        };
+        isPlaylist = false;
+        currentPlaylist = [];
+        currentIndex = 0;
+        playTrack(track);
+        return;
+      }
+      // Reproducción de playlist
+      if (Array.isArray(data.playlist) && typeof data.index === "number") {
+        // normalizar elementos (por si falta algún campo)
+        currentPlaylist = data.playlist.map(t => ({
+          titulo: t?.titulo ?? '',
+          artista: t?.artista ?? '',
+          ruta: t?.ruta ?? '',
+          thumbnail: t?.thumbnail ?? ''
+        })).filter(t => t.ruta); // solo con ruta válida
+        if (!currentPlaylist.length) return;
+        playFromPlaylist(data.index);
+      }
+    });
+
+    /** Controles rápidos por teclado (opcional): ← / → para anterior/siguiente **/
+    window.addEventListener('keydown', (e)=>{
+      if (!isPlaylist || !currentPlaylist.length) return;
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (currentIndex + 1 < currentPlaylist.length) {
+          currentIndex++;
+          playTrack(currentPlaylist[currentIndex]);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (currentIndex - 1 >= 0) {
+          currentIndex--;
+          playTrack(currentPlaylist[currentIndex]);
+        }
+      }
+    });
+  })();
+  </script>
+
+</body>
+</html>
