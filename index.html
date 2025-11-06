@@ -14,8 +14,27 @@
       // apiFetch limpia el token y como NO estamos en login, nos manda a login
     }
   }
+  
   </script>
 </head>
+<script>
+  // este listener recibe el mensaje de reproductor.html y ajusta rows del frameset
+  window.addEventListener('message', (e) => {
+    if (!e.data || !e.data.setPlayerHeight) return;
+    const h = Number(e.data.setPlayerHeight) || 120;
+    try {
+      const fs = document.getElementsByTagName('frameset')[0];
+      if (!fs) return;
+      // ajusta la última fila a px (10%,*,<px>)
+      // conservá las dos primeras como estaban (siempre: 10% y *), pero reemplaza la última
+      // si querés otra lógica, la adaptamos
+      fs.rows = `10%,*,${Math.max(100, h)}px`;
+    } catch (err) {
+      console.warn('No se pudo ajustar frameset rows', err);
+    }
+  }, false);
+</script>
+
 
 <!-- OJO: en documentos con frames, no se usa <body>; va <frameset> -->
 <frameset rows="10%,*,80px" border="0" onload="boot()">
@@ -29,7 +48,7 @@
   </frameset>
 
   <!-- Reproductor -->
-  <frame src="reproductor.html" name="reproductorFrame" scrolling="no" noresize>
+  <frame src="reproductor.html" name="reproductorFrame" scrolling="auto" noresize>
   <noframes>
     <p>Tu navegador no soporta frames. <a href="login.html">Ingresá aquí</a>.</p>
   </noframes>
