@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="style.css">
-<title>Contenido</title>
-<style>
-    .btn-agregar {
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Contenido</title>
+    <style>
+      .btn-agregar {
         position: absolute;
         top: 5px;
         right: 5px;
         width: 25px;
         height: 25px;
         border-radius: 50%;
-        background-color: #1DB954;
+        background-color: #1db954;
         color: black;
         font-weight: bold;
         border: none;
@@ -21,9 +21,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
+      }
 
-    .miniPlaylists {
+      .miniPlaylists {
         position: absolute;
         background-color: #2a2a2a;
         border-radius: 8px;
@@ -31,142 +31,147 @@
         display: none;
         flex-direction: column;
         z-index: 100;
-    }
+      }
 
-    .miniPlaylists button {
+      .miniPlaylists button {
         background: none;
         border: none;
         color: white;
         padding: 5px 10px;
         cursor: pointer;
         text-align: left;
-    }
+      }
 
-    .miniPlaylists button:hover {
-        background-color: #1DB954;
+      .miniPlaylists button:hover {
+        background-color: #1db954;
         color: black;
-    }
+      }
 
-    .cancion-wrapper {
+      .cancion-wrapper {
         position: relative;
         display: inline-block;
         margin: 10px;
-    }
+      }
 
-    #notificacion {
+      #notificacion {
         position: fixed;
         bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background: #1DB954;
+        background: #1db954;
         color: black;
         padding: 10px 20px;
         border-radius: 8px;
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: 999;
-    }
-    .seccion-lista {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 20px;
-    padding: 10px 0;
-}
+      }
+      .seccion-lista {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 20px;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body class="main">
+    <h1>Explorar canciones</h1>
 
-</style>
-</head>
-<body class="main">
-<h1>Explorar canciones</h1>
+    <div id="contenedor-secciones"></div>
 
-<div id="contenedor-secciones"></div>
+    <div id="notificacion"></div>
 
-<div id="notificacion"></div>
+    <script src="canciones.js"></script>
+    <script src="api.js"></script>
+    <script>
+      function mostrarNotificacion(texto) {
+        const notificacion = document.getElementById("notificacion");
+        notificacion.textContent = texto;
+        notificacion.style.opacity = "1";
+        setTimeout(() => (notificacion.style.opacity = "0"), 2000);
+      }
 
-<script src="canciones.js"></script>
-<script src="api.js"></script>
-<script>
-function mostrarNotificacion(texto) {
-    const notificacion = document.getElementById("notificacion");
-    notificacion.textContent = texto;
-    notificacion.style.opacity = "1";
-    setTimeout(() => notificacion.style.opacity = "0", 2000);
-}
+      // crear una sección y llenarla
+      function crearSeccion(nombre, canciones) {
+        const contenedor = document.getElementById("contenedor-secciones");
 
-// crear una sección y llenarla
-function crearSeccion(nombre, canciones) {
-    const contenedor = document.getElementById("contenedor-secciones");
+        const h3 = document.createElement("h3");
+        h3.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+        contenedor.appendChild(h3);
 
-    const h3 = document.createElement("h3");
-    h3.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-    contenedor.appendChild(h3);
+        const lista = document.createElement("div");
+        lista.classList.add("seccion-lista"); // usamos estilos globales
+        contenedor.appendChild(lista);
 
-    const lista = document.createElement("div");
-    lista.classList.add("seccion-lista"); // usamos estilos globales
-    contenedor.appendChild(lista);
+        generarCanciones(lista, canciones);
+      }
 
-    generarCanciones(lista, canciones);
-}
+      function generarCanciones(contenedor, canciones) {
+        canciones.forEach((c) => {
+          const wrapper = document.createElement("div");
+          wrapper.classList.add("cancion-wrapper");
 
-function generarCanciones(contenedor, canciones) {
-    canciones.forEach(c => {
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("cancion-wrapper");
-
-        const div = document.createElement("div");
-        div.classList.add("cancion");
-        div.innerHTML = `
+          const div = document.createElement("div");
+          div.classList.add("cancion");
+          div.innerHTML = `
             <img src="${c.thumbnail}" alt="${c.titulo}">
             <p>${c.titulo}</p>
         `;
 
-        // Botón +
-        const btnAgregar = document.createElement("button");
-        btnAgregar.textContent = "+";
-        btnAgregar.classList.add("btn-agregar");
+          // Botón +
+          const btnAgregar = document.createElement("button");
+          btnAgregar.textContent = "+";
+          btnAgregar.classList.add("btn-agregar");
 
-        const mini = document.createElement("div");
-        mini.classList.add("miniPlaylists");
+          const mini = document.createElement("div");
+          mini.classList.add("miniPlaylists");
 
-        btnAgregar.addEventListener("click", async (e) => {
+          btnAgregar.addEventListener("click", async (e) => {
             mini.innerHTML = "";
             const res = await api.playlists();
-            (res.playlists || []).forEach(pl => {
-                const btnPl = document.createElement("button");
-                btnPl.textContent = pl.nombre;
-                btnPl.onclick = async () => {
-                    await api.addSong(pl.id, c);
-                    mostrarNotificacion(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
-                    mini.style.display = "none";
-                };
-                mini.appendChild(btnPl);
+            (res.playlists || []).forEach((pl) => {
+              const btnPl = document.createElement("button");
+              btnPl.textContent = pl.nombre;
+              btnPl.onclick = async () => {
+                await api.addSong(pl.id, c);
+                mostrarNotificacion(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
+                mini.style.display = "none";
+              };
+              mini.appendChild(btnPl);
             });
-            mini.style.display = mini.style.display === "flex" ? "none" : "flex";
-            mini.style.top = (e.target.offsetTop + 30) + "px";
+            mini.style.display =
+              mini.style.display === "flex" ? "none" : "flex";
+            mini.style.top = e.target.offsetTop + 30 + "px";
             mini.style.left = e.target.offsetLeft + "px";
+          });
+
+          wrapper.appendChild(div);
+          wrapper.appendChild(btnAgregar);
+          wrapper.appendChild(mini);
+
+          div.addEventListener("click", () => {
+            window.parent.frames["reproductorFrame"].postMessage(
+              {
+                song: c,
+              },
+              "*"
+            );
+          });
+
+          contenedor.appendChild(wrapper);
         });
+      }
 
-        wrapper.appendChild(div);
-        wrapper.appendChild(btnAgregar);
-        wrapper.appendChild(mini);
+      // 🎩 MAGIA: obtener todas las secciones y generarlas dinámicamente
+      const secciones = [...new Set(cancionesCatalogo.map((c) => c.seccion))];
 
-        div.addEventListener("click", () => {
-            window.parent.frames['reproductorFrame'].postMessage({
-                song: c
-            }, '*');
-        });
-
-        contenedor.appendChild(wrapper);
-    });
-}
-
-// 🎩 MAGIA: obtener todas las secciones y generarlas dinámicamente
-const secciones = [...new Set(cancionesCatalogo.map(c => c.seccion))];
-
-secciones.forEach(seccion => {
-    const canciones = cancionesCatalogo.filter(c => c.seccion === seccion);
-    crearSeccion(seccion, canciones);
-});
-</script>
-</body>
+      secciones.forEach((seccion) => {
+        const canciones = cancionesCatalogo.filter(
+          (c) => c.seccion === seccion
+        );
+        crearSeccion(seccion, canciones);
+      });
+    </script>
+  </body>
 </html>
