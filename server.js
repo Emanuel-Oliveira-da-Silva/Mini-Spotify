@@ -85,15 +85,25 @@ app.post("/api/register", async (req, res) => {
 
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body || {};
-  const row = db
-    .prepare("SELECT * FROM users WHERE username = ?")
-    .get(username);
-  if (!row) return res.status(400).json({ error: "Credenciales inválidas" });
+
+  const row = db.prepare("SELECT * FROM users WHERE username = ?").get(username);
+
+  // Usuario NO existe
+  if (!row) {
+    return res.status(400).json({ error: "Usuario inexistente" });
+  }
+
+  // Verificar contraseña
   const ok = await bcrypt.compare(password, row.password_hash);
-  if (!ok) return res.status(400).json({ error: "Credenciales inválidas" });
+  if (!ok) {
+    return res.status(400).json({ error: "Contraseña incorrecta" });
+  }
+
+  // Login correcto
   const user = { id: row.id, username: row.username };
   res.json({ user, token: createToken(user) });
 });
+
 
 app.get("/api/me", auth, (req, res) => {
   const u = db

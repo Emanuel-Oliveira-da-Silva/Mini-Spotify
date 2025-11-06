@@ -340,6 +340,237 @@ const cancionesCatalogo = [
       "https://i.scdn.co/image/ab67616d0000b2735d7d966732bd44ac2a13b614",
     seccion: "Vocal",
   },
+  {
+    ruta:"Canciones/Frank Sinatra/The World We Knew (Over And Over).mp3",
+    titulo: "The World We Knew (Over And Over) / Frank Sinatra",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b2733e2331ff09f59ea3c87fe5d6",
+    seccion: "Vocal",
+  },
+  {
+    ruta:"Canciones/Mariana Froes/Mari Froes - Espelho (Lyric Video).mp3",
+    titulo: "Espelho / Mariana Froes",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273b2726b2a47d37ec462877953",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Mariana Froes/Mari Froes - Moça.mp3",
+    titulo: "Moça / Mariana Froes",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273cc90015876bdf60d02be0f36",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Murart/Murart e Revna- Samba Paixão (Clipe Oficial).mp3",
+    titulo: "Samba Paixão / Murart",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273f9d21b10e69ae918e7e879a0",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Mariana Froes/Mari Froes - Figa De Guiné (Official Video).mp3",
+    titulo: "Figa De Guiné / Mariana Froes",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273f0123fd6c668a3065d97b7fd",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Tom Jobin/Garota De Ipanema.mp3",
+    titulo: "Garota De Ipanema / Tom Jobin",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d00001e02fa4cdef55debc2f9c79b75c6",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Barbatuques/Baianá.mp3",
+    titulo: "Baianá / Barbatuques",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273fc7ce3acfa2e8c2479bcf621",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/Harry James/It's Been A Long Long Time.mp3",
+    titulo: "It's Been A Long Long Time / Harry James",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273088bd566df587707d14bb5bb",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Louis Armstrong/La vie en rose.mp3",
+    titulo: "La vie en rose / Louis Armstrong",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273ce4c83c6514608bb1a597c76",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Grover Washington,jr/Just the Two of Us (feat. Bill Withers).mp3",
+    titulo: "Just the Two of Us / Grover Washington,jr",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273472fbc1d5743c7d3c75b9ec0",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Michael Bublé/Michael Bublé - L.O.V.E. [Official Audio].mp3",
+    titulo: "L.O.V.E. / Michael Bublé",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273d72cafc06acc89d30bf6093a",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Dean Martin/Dean Martin - Everybody Loves Somebody (Official Audio).mp3",
+    titulo: "Everybody Loves Somebody / Dean Martin",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273c42d497351d85d00188cf5d5",
+    seccion: "Vocal",
+  },
+  {
+    ruta: "Canciones/Bobby Darin/Beyond the Sea.mp3",
+    titulo: "Beyond the Sea / Bobby Darin",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273dd5593f99402c3c85f67af22",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Frank Sinatra/My Way Of Life.mp3",
+    titulo: "My Way Of Life / Frank Sinatra",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273a0209db6a0a102cae469d4f9",
+    seccion: "Vocal",
+  },
+  {
+    ruta: "Canciones/Sade/Smooth Operator.mp3",
+    titulo: "Smooth Operator / Sade",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b2735e25e034e25258b356774c79",
+    seccion: "Jazz",
+  },
+  {
+    ruta: "Canciones/Michael Jackson/Rock With You [aCjxP58Ydik].mp3",
+    titulo: "Rock With You / Michael Jackson",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b2737027294551db4fda68b5ddac",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/carl carlton/She's A Bad Mama Jama (She's Built, She's Stacked).mp3",
+    titulo: "She's A Bad Mama Jama / carl carlton",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273de341c04cfbdaac04548ff4f",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/Marcos Valle/Estrelar.mp3",
+    titulo: "Estrelar / Marcos Valle",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273580d01637ff3bb5f27206d41",
+    seccion: "Samba",
+  },
+  {
+    ruta: "Canciones/スペクトラム/FLY.mp3",
+    titulo: "F・L・Y (FLY)/ スペクトラム",
+    thumbnail:
+      "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8459654d092a11e6255e1ca657",
+    seccion: "jpop",
+  },
+  {
+    ruta: "Canciones/The Brothers Jonhson/Stomp!.mp3",
+    titulo: "Stomp! / The Brothers Jonhson",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273b3dd4b1619bac722e29c7624",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/The Emotions/Best of My Love.mp3",
+    titulo: "Best of My Love / The Emotions",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d00001e020b63ed1959e7bf87e82f0726",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/Cheryl Lynn/Got to Be Real.mp3",
+    titulo: "Got to Be Real / Cheryl Lynn",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273c0e98d7c48b548f1a3833368",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/A K I N A/Estrelar (Remix).mp3",
+    titulo: "Estrelar (Remix) / A K I N A",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273c673a1da9dd9688f1e48a50b",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/Michael Jackson/Remember the Time.mp3",
+    titulo: "Remember the Time / Michael Jackson",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/Michael Jackson/P.Y.T. (Pretty Young Thing).mp3",
+    titulo: "P.Y.T. (Pretty Young Thing) / Michael Jackson",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273de437d960dda1ac0a3586d97",
+    seccion: "funk",
+  },
+  {
+    ruta: "Canciones/Cardi B/Please Me(Feat. Bruno Mars).mp3",
+    titulo: "Please Me(feat. Bruno Mars) / Cardi B ",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273288883647008cefba0db5402",
+    seccion: "hiphop",
+  },
+  {
+    ruta: "Canciones/Bruno-Mars/Smokin Out The Window.mp3",
+    titulo: "Smokin Out The Window / Bruno Mars",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273ca1fa2ec5795f48e610dc058",
+    seccion: "pop",
+  },
+  {
+    ruta: "Canciones/Bruno-Mars/After Last Night (with Thundercat & Bootsy Collins).mp3",
+    titulo: "After Last Night (with Thundercat & Bootsy Collins) / Bruno Mars",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273ca1fa2ec5795f48e610dc058",
+    seccion: "tendencia",
+  },
+  {
+    ruta: "Canciones/Bruno-Mars/Lady Gaga, Bruno Mars - Die With A Smile (Official Music Video).mp3",
+    titulo: "Die With A Smile / Bruno Mars & Lady Gaga",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b27382ea2e9e1858aa012c57cd45",
+    seccion: "pop",
+  },
+  {
+    ruta: "Canciones/FUNK/É o Pombo, É o Neymar, Vinícius Jr E Paquetá (Copa do Mundo 2022).mp3",
+    titulo: "É o Pombo, É o Neymar, Vinícius Jr E Paquetá / Dj Dollynho da Lapa",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d0000b273bb92d2a16cea15b35c007ecc",
+    seccion: "batidas",
+  },
+  {
+    ruta: "Canciones/FUNK/VEM COM A TROPA DO TUBARÃO TU TU TU TU TUBARÃO, ESSA É A TROPA DO TUBARÃO x FUNK TIKTOK - MC PÂNICO.mp3",
+    titulo: "TROPA DO TUBARÃO / MC PÂNICO",
+    thumbnail:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQObH5FWzVfGHwZsbuS3wJvjx4Bq6eptTRr-A&s",
+    seccion: "batidas",
+  },
+  {
+    ruta: "Canciones/FUNK/Jogadinha do Paqueta.mp3",
+    titulo: "Jogadinha do Paqueta / MC RF",
+    thumbnail:
+      "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8451f4324c753ccebc9641e6a8",
+    seccion: "batidas",
+  },
+  {
+    ruta: "Canciones/FUNK/Vou Passar Sarrando.mp3",
+    titulo: "Vou Passar Sarrando / MC BF",
+    thumbnail:
+      "https://i.scdn.co/image/ab67616d00001e0215a66d2532938b3086cfb97b",
+    seccion: "batidas",
+  }
 ];
 
 window.cancionesCatalogo = cancionesCatalogo;
