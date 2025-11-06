@@ -66,26 +66,20 @@
         transition: opacity 0.3s ease;
         z-index: 999;
     }
+    .seccion-lista {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px 0;
+}
+
 </style>
 </head>
 <body class="main">
-<h2>Explorar canciones</h2>
+<h1>Explorar canciones</h1>
 
-<!-- sección en tendencia -->
-<h3>Canciones en tendencia</h3>
-<div id="canciones-tendencia"></div>
-
-<!-- sección de Pop -->
-<h3>Pop</h3>
-<div id="canciones-pop"></div>
-
-<!-- sección de Hip Hop -->
-<h3>Hip Hop</h3>
-<div id="canciones-hiphop"></div>
-
-<!-- sección de Batidas -->
-<h3>Batidas</h3>
-<div id="canciones-batidas"></div>
+<div id="contenedor-secciones"></div>
 
 <div id="notificacion"></div>
 
@@ -97,6 +91,21 @@ function mostrarNotificacion(texto) {
     notificacion.textContent = texto;
     notificacion.style.opacity = "1";
     setTimeout(() => notificacion.style.opacity = "0", 2000);
+}
+
+// crear una sección y llenarla
+function crearSeccion(nombre, canciones) {
+    const contenedor = document.getElementById("contenedor-secciones");
+
+    const h3 = document.createElement("h3");
+    h3.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    contenedor.appendChild(h3);
+
+    const lista = document.createElement("div");
+    lista.classList.add("seccion-lista"); // usamos estilos globales
+    contenedor.appendChild(lista);
+
+    generarCanciones(lista, canciones);
 }
 
 function generarCanciones(contenedor, canciones) {
@@ -111,76 +120,53 @@ function generarCanciones(contenedor, canciones) {
             <p>${c.titulo}</p>
         `;
 
-        // Botón + para agregar a playlist
+        // Botón +
         const btnAgregar = document.createElement("button");
         btnAgregar.textContent = "+";
         btnAgregar.classList.add("btn-agregar");
 
-        // Mini menú playlists
         const mini = document.createElement("div");
         mini.classList.add("miniPlaylists");
 
         btnAgregar.addEventListener("click", async (e) => {
-    // Si ya está abierto, cerralo
-    if (mini.style.display === "flex") {
-        mini.style.display = "none";
-        return;
-    }
-
-    // Limpiar menú antes de llenarlo
-    mini.innerHTML = "";
-
-    try {
-        const res = await api.playlists(); // devuelve { playlists: [...] }
-        const playlists = res.playlists || [];
-        playlists.forEach(pl => {
-
-            const btnPl = document.createElement("button");
-            btnPl.textContent = pl.nombre;
-            btnPl.addEventListener("click", async () => {
-                await api.addSong(pl.id, c); // usa la API para agregar canción
-                mostrarNotificacion(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
-                mini.style.display = "none";
+            mini.innerHTML = "";
+            const res = await api.playlists();
+            (res.playlists || []).forEach(pl => {
+                const btnPl = document.createElement("button");
+                btnPl.textContent = pl.nombre;
+                btnPl.onclick = async () => {
+                    await api.addSong(pl.id, c);
+                    mostrarNotificacion(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
+                    mini.style.display = "none";
+                };
+                mini.appendChild(btnPl);
             });
-            mini.appendChild(btnPl);
+            mini.style.display = mini.style.display === "flex" ? "none" : "flex";
+            mini.style.top = (e.target.offsetTop + 30) + "px";
+            mini.style.left = e.target.offsetLeft + "px";
         });
-
-        mini.style.display = "flex";
-        mini.style.top = (e.target.offsetTop + 30) + "px";
-        mini.style.left = e.target.offsetLeft + "px";
-    } catch (err) {
-        console.error("Error cargando playlists:", err);
-        mostrarNotificacion("No se pudieron cargar las playlists");
-    }
-});
 
         wrapper.appendChild(div);
         wrapper.appendChild(btnAgregar);
         wrapper.appendChild(mini);
 
-        // Click normal → reproducir
         div.addEventListener("click", () => {
-    // Enviamos el objeto completo para que el reproductor tenga título, artista y thumbnail
-    window.parent.frames['reproductorFrame'].postMessage({
-      song: {
-        ruta: c.ruta,
-        titulo: c.titulo || '',
-        artista: c.artista || '',
-        thumbnail: c.thumbnail || ''
-      }
-    }, '*');
-});
+            window.parent.frames['reproductorFrame'].postMessage({
+                song: c
+            }, '*');
+        });
 
         contenedor.appendChild(wrapper);
     });
 }
 
-// Cargar canciones por sección
-generarCanciones(document.getElementById("canciones-tendencia"), cancionesCatalogo.filter(c => c.seccion === "tendencia"));
-generarCanciones(document.getElementById("canciones-pop"), cancionesCatalogo.filter(c => c.seccion === "pop"));
-generarCanciones(document.getElementById("canciones-hiphop"), cancionesCatalogo.filter(c => c.seccion === "hiphop"));
-generarCanciones(document.getElementById("canciones-batidas"), cancionesCatalogo.filter(c => c.seccion === "batidas"));
+// 🎩 MAGIA: obtener todas las secciones y generarlas dinámicamente
+const secciones = [...new Set(cancionesCatalogo.map(c => c.seccion))];
 
+secciones.forEach(seccion => {
+    const canciones = cancionesCatalogo.filter(c => c.seccion === seccion);
+    crearSeccion(seccion, canciones);
+});
 </script>
 </body>
 </html>

@@ -30,14 +30,14 @@ h3 {
     font-weight: bold;
 }
 
-/* Contenedor de canciones */
-#canciones-tendencia,#canciones-pop,#canciones-batidas,#canciones-hiphop {
-    display: flex;
-    flex-wrap: nowrap; /* Alinear en una fila */
-    overflow-x: auto; /* Scroll horizontal si hay muchas canciones */
-    gap: 20px; /* Espaciado entre canciones */
-    padding: 10px;
+.seccion-canciones {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 10px;
 }
+
 
 /* Estilo para cada canción */
 .cancion {

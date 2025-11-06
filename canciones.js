@@ -22,13 +22,13 @@ const cancionesCatalogo = [
     titulo: "Rule #15 Four aces / Fish in a Birdcage",
     ruta: "Canciones/Fish-in-a-Birdcage/Waterfall/Rule 15 Four Aces.mp3",
     thumbnail: "https://cdn-images.dzcdn.net/images/cover/765e10e196a40121b194b55e60de0917/0x1900-000000-80-0-0.jpg",
-    seccion: ""
+    seccion: "tendencia"
   },
   {
     titulo: "Rule #7 - Angel Tango / Fish in a Birdcage",
     ruta: "Canciones/Fish-in-a-Birdcage/Through-the-tides/Rule7 Angel Tango.mp3",
     thumbnail: "data:image/jpeg;base64,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",
-    seccion: ""
+    seccion: "tendencia"
   },
   {
     ruta: "Canciones/FUNK/Tu cha cha_ Brazil Funk Beat.mp3",
@@ -191,6 +191,108 @@ const cancionesCatalogo = [
     titulo: "Hoe Cakes / MF DOOM",
     thumbnail: "https://http2.mlstatic.com/D_Q_NP_2X_890214-MLA80810753510_112024-T.webp",
     seccion: "hiphop"
+  },
+  {
+    ruta: "Canciones/Halcali - Tema/おつかれSUMMER.mp3",
+    titulo: "おつかれSUMMER / Halcali",
+    thumbnail: "https://cdn-images.dzcdn.net/images/cover/845635b7c7f33ea6ed37d7ed81665bae/0x1900-000000-80-0-0.jpg",
+    seccion: "jpop"
+  },
+  {
+    ruta:"Canciones/原口沙輔/Medicine (イガク).mp3",
+    titulo: "Medicine (イガク) / 原口沙輔",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273f183e89919d7af2c00da9d83",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/原口沙輔/ホントノ - 重音テト.mp3",
+    titulo: "ホントノ - 重音テト / 原口沙輔",
+    thumbnail: "https://i1.sndcdn.com/artworks-MzMPe0mB9F23N6m0-hxcN3A-t1080x1080.jpg",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/アイナ・ジ・エンド/AiNA THE END - Katsubou.mp3",
+    titulo: "Katsubou / アイナ・ジ・エンド",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b27335e350b6d90d5dfce10d18de",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/ADO/Aishite Aishite Aishite.mp3",
+    titulo: "Aishite Aishite Aishite / ADO",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273f5912abed0ea22e746552771",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/ハナエ/Kamisama Hajimemashita.mp3",
+    titulo: "Kamisama Hajimemashita / ハナエ",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b2737dc535692414fb8c5c13a9c1",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/アイナ・ジ・エンド/アイナジエンド  革命道中 - On The Way.mp3",
+    titulo: "革命道中 - On The Way / アイナ・ジ・エンド",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b27335e350b6d90d5dfce10d18de",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/Miki Matsubara/真夜中のドアStay With Me.mp3",
+    titulo: "真夜中のドアStay With Me / Miki Matsubara",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b27387a9458833df6cea79713fc7",
+    seccion: "jpop"
+  },
+  {
+    ruta: "Canciones/Jamiroquai/Jamiroquai - Virtual Insanity (Official Video).mp3",
+    titulo: "Virtual Insanity / Jamiroquai",
+    thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsqcgKY_YfSXBuUo8hEZw2RIpev5--Ih3Bew&s",
+    seccion: "pop"
+  },
+  {
+    ruta: "Canciones/Skee-lo/Skee-Lo - I Wish (Official Video) [ryDOy3AosBw].mp3",
+    titulo: "I Wish / Skee-lo",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b2735e2bca5e5a3f48064f2300be",
+    seccion: "hiphop"
+  },
+  {
+    ruta: "Canciones/Bell Bin Devoe/BELL BIV DEVOE POISON.mp3",
+    titulo: "Poison / Bell Bin Devoe",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273fbbd1a631e4908f0a9be841e",
+    seccion: "hiphop"
+  },
+  {
+    ruta: "Canciones/Bobby Caldwell/What You Won't Do for Love.mp3",
+    titulo: "What You Won't Do for Love / Bobby Caldwell",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273922defaf8c87b808c462e7c0",
+    seccion: "Jazz"
+  },
+  {
+    ruta: "Canciones/Frank Sinatra/My Way (2008 Remastered).mp3",
+    titulo: "My Way / Frank Sinatra",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273b81d66d1416afa139d12767b",
+    seccion: "Vocal"
+  },
+  {
+    ruta:"Canciones/Frank Sinatra/Fly Me To The Moon (2008 Remastered).mp3",
+    titulo: "Fly Me To The Moon / Frank Sinatra",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273b81d66d1416afa139d12767b",
+    seccion: "Vocal"
+  },
+  {
+    ruta: "Canciones/Paul Anka/Put Your Head On My Shoulder.mp3",
+    titulo: "Put Your Head On My Shoulder / Paul Anka",
+    thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmo8548e5Bh3shnkCTidgF5Z33vjJ5pxvjkA&s",
+    seccion: "Vocal"
+  },
+  {
+    ruta: "Canciones/Michael Bublé/Sway.mp3",
+    titulo: "Sway / Michael Bublé",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b273b732a522a686bb304a5d3fdf",
+    seccion: "Vocal"
+  },
+  {
+    ruta: "Canciones/Michael Bublé/Feeling Good.mp3",
+    titulo: "Feeling Good / Michael Bublé",
+    thumbnail: "https://i.scdn.co/image/ab67616d0000b2735d7d966732bd44ac2a13b614",
+    seccion: "Vocal"
   }
 
 ];

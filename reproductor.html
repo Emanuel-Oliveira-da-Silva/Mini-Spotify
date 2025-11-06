@@ -478,6 +478,18 @@ let radioHistory = []; // guardará tracks (objetos) en orden de reproducción
     // initial resize (after layout)
     window.addEventListener('load', () => {
       setTimeout(requestParentResize, 80); // slight delay to ensure images loaded
+      // --- PRE-CARGAR UNA CANCIÓN POR DEFECTO ---
+  if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length > 0) {
+    const c = window.cancionesCatalogo[0]; // ← elegimos siempre la primera
+    playTrack({
+      titulo: c.titulo,
+      artista: c.artista || '',
+      ruta: c.ruta,
+      thumbnail: c.thumbnail || ''
+    });
+    audio.pause();   // importante → no reproducir
+    audio.currentTime = 0; // asegurar que queda en 00:00
+  }
     });
 
     // expose for debugging
