@@ -464,7 +464,7 @@ const cancionesCatalogo = [
     titulo: "Estrelar / Marcos Valle",
     thumbnail:
       "https://i.scdn.co/image/ab67616d0000b273580d01637ff3bb5f27206d41",
-    seccion: "Samba",
+    seccion: "funk",
   },
   {
     ruta: "Canciones/スペクトラム/FLY.mp3",
