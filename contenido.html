@@ -160,8 +160,16 @@ function generarCanciones(contenedor, canciones) {
 
         // Click normal → reproducir
         div.addEventListener("click", () => {
-            window.parent.frames['reproductorFrame'].postMessage({ song: c.ruta }, '*');
-        });
+    // Enviamos el objeto completo para que el reproductor tenga título, artista y thumbnail
+    window.parent.frames['reproductorFrame'].postMessage({
+      song: {
+        ruta: c.ruta,
+        titulo: c.titulo || '',
+        artista: c.artista || '',
+        thumbnail: c.thumbnail || ''
+      }
+    }, '*');
+});
 
         contenedor.appendChild(wrapper);
     });

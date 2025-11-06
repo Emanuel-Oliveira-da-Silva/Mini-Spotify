@@ -350,13 +350,43 @@
     // message API to receive playlist or song from other frames
     window.addEventListener('message', (e) => {
       const data = e.data || {};
-      if (data.song) {
-        const path = String(data.song);
-        const track = { ruta: path, titulo: path.split("/").pop().replace(/\.(mp3|wav|ogg)$/i,''), artista: '' };
-        isPlaylist = false; currentPlaylist = []; currentIndex = 0;
-        playTrack(track);
-        return;
+
+  // Compatibilidad: data.song puede ser string (ruta) o un objeto con metadata
+  if (data.song) {
+    let track;
+    if (typeof data.song === 'string') {
+      // string: construimos track e intentamos buscar metadata en el catálogo local
+      const path = data.song;
+      // intentar encontrar en cancionesCatalogo por ruta o por nombre de archivo
+      let match = (window.cancionesCatalogo || []).find(x => x.ruta === path);
+      if (!match) {
+        const filename = path.split('/').pop();
+        match = (window.cancionesCatalogo || []).find(x => (x.ruta||'').split('/').pop() === filename);
       }
+      if (match) {
+        track = { titulo: match.titulo, artista: match.artista || '', ruta: match.ruta, thumbnail: match.thumbnail || '' };
+      } else {
+        track = { ruta: path, titulo: path.split("/").pop().replace(/\.(mp3|wav|ogg)$/i,''), artista:'', thumbnail: '' };
+      }
+    } else if (typeof data.song === 'object') {
+      // ya vino con metadata
+      track = {
+        ruta: data.song.ruta || '',
+        titulo: data.song.titulo || '',
+        artista: data.song.artista || '',
+        thumbnail: data.song.thumbnail || ''
+      };
+    } else {
+      return;
+    }
+
+    isPlaylist = false;
+    currentPlaylist = [];
+    currentIndex = 0;
+    playTrack(track);
+    return;
+  }
+      // data.playlist: array de tracks + data.index: número
       if (Array.isArray(data.playlist) && typeof data.index === 'number') {
         currentPlaylist = data.playlist.map(t => ({ titulo: t?.titulo||'', artista: t?.artista||'', ruta: t?.ruta||'', thumbnail: t?.thumbnail||'' })).filter(t => t.ruta);
         if (!currentPlaylist.length) return;
