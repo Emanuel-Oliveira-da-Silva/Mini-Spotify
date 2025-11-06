@@ -214,12 +214,25 @@ async function cargar(){
     estado.playlist = r.playlist;
     estado.canciones = r.canciones || [];
     tituloEl.textContent = estado.playlist?.nombre || 'Playlist';
+
+    // 🔧 Reparar canciones sin thumbnail usando el catálogo local
+    estado.canciones = estado.canciones.map(c => {
+      if (!c.thumbnail) {
+        const match = cancionesCatalogo.find(x =>
+          (x.ruta === c.ruta) || (x.titulo === c.titulo)
+        );
+        if (match) c.thumbnail = match.thumbnail;
+      }
+      return c;
+    });
+
     renderCanciones();
   } catch (e) {
     alert(e?.error || 'Error al cargar la playlist');
     location.href = 'contenido.html';
   }
 }
+
 
 // ======= Volver =======
 document.getElementById('btn-volver').addEventListener('click', () => {
@@ -325,6 +338,7 @@ function mostrarMiniCanciones(query="") {
             titulo: c.titulo,
             artista: c.artista || '',
             ruta: c.ruta || '',
+            thumbnail: c.thumbnail || '', 
             duration: c.duration || null
           });
           await cargar();
