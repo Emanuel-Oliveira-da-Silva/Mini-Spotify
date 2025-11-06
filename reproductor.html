@@ -96,7 +96,7 @@
 
     /* Volumen: oculto salvo hover */
     .volumen {
-      display:flex; align-items:center; gap:6px; margin-left:8px; position:relative;
+      display:flex; align-items:center; gap:6px; margin-left:8px; position:relative; color: #1DB954;
     }
     .volumen input[type="range"] {
       width: 0; opacity:0; pointer-events:none; transition: width .18s ease, opacity .12s ease;
@@ -105,7 +105,7 @@
     .volumen input[type="range"]:focus {
       width: 100px; opacity:1; pointer-events:auto;
     }
-    .muted { font-size:11px; color:#ccc; text-align:center; margin-top:4px; opacity:0.9; }
+    .muted { font-size:11px; color:#ccc;; text-align:center; margin-top:4px; opacity:0.9; }
 
     /* Make sure everything is vertically aligned in small heights */
     @media (max-width:420px) {
@@ -174,6 +174,10 @@
     const prevBtn = document.getElementById('prevBtn');
     const volumenControl = document.getElementById('volumenControl');
 
+// === HISTORIAL para modo radio (contenido.html) ===
+let radioHistory = []; // guardará tracks (objetos) en orden de reproducción
+// Nota: radioHistory[radioHistory.length-1] es el track actual
+
     // estado
     let currentPlaylist = [];
     let currentIndex = 0;
@@ -200,15 +204,15 @@
 
     // robust playTrack: encode path, load, catch play() promise
     function playTrack(track){
-      if (!audio) return;
-      if (!track || !track.ruta) {
-        tituloEl.textContent = "Archivo de audio no disponible";
-        sub.textContent = '';
-        audio.pause();
-        audio.removeAttribute('src');
-        audio.load();
-        return;
-      }
+  if (!audio) return;
+  if (!track || !track.ruta) {
+    tituloEl.textContent = "Archivo de audio no disponible";
+    sub.textContent = '';
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    return;
+  }
 
       // encode path (relative paths): encode segments to preserve slashes
       let src = String(track.ruta || '').trim();
@@ -223,6 +227,13 @@
       audio.src = src;
       audio.load();
       setUIForTrack(track);
+
+      if (!isPlaylist) {
+  const last = radioHistory[radioHistory.length - 1];
+  if (!last || last.ruta !== track.ruta) {
+    radioHistory.push(track);
+  }
+}
 
       audio.play().then(()=> {
         // ok
@@ -266,26 +277,46 @@
     });
 
     audio.addEventListener('ended', () => {
-      if (isPlaylist) {
-        currentIndex++;
-        if (currentIndex < currentPlaylist.length) {
-          playTrack(currentPlaylist[currentIndex]);
-        } else {
-          isPlaylist = false;
-          tituloEl.textContent = "Fin de la playlist";
-          sub.textContent = '';
-        }
-      } else {
-        // fallback random
-        if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length) {
-          const rnd = window.cancionesCatalogo[Math.floor(Math.random()*window.cancionesCatalogo.length)];
-          playTrack({ titulo: rnd.titulo, artista: rnd.artista, ruta: rnd.ruta, thumbnail: rnd.thumbnail });
-        } else {
-          tituloEl.textContent = "No se está reproduciendo ninguna canción";
-          sub.textContent = '';
-        }
-      }
-    });
+  if (isPlaylist) {
+    currentIndex++;
+    if (currentIndex < currentPlaylist.length) {
+      playTrack(currentPlaylist[currentIndex]);
+    } else {
+      isPlaylist = false;
+      tituloDiv.textContent = "Fin de la playlist";
+      sub.textContent = "";
+    }
+  } else {
+
+    if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length > 0) {
+
+      const actual = audio.src.split('/').pop();
+
+      let nueva;
+      do {
+        nueva = window.cancionesCatalogo[
+          Math.floor(Math.random() * window.cancionesCatalogo.length)
+        ];
+      } while (nueva && nueva.ruta.split('/').pop() === actual);
+
+      // ✅ Asegurar modo aleatorio continuo
+      isPlaylist = false;
+
+      playTrack({
+        titulo: nueva.titulo,
+        artista: nueva.artista || '',
+        ruta: nueva.ruta,
+        thumbnail: nueva.thumbnail || ''
+      });
+
+    } else {
+      tituloDiv.textContent = "No hay canciones disponibles.";
+      sub.textContent = "";
+    }
+  }
+});
+
+
 
     audio.addEventListener('error', () => {
       console.error('audio error', audio.error);
@@ -327,19 +358,61 @@
     }
 
     nextBtn.addEventListener('click', () => {
-      if (!isPlaylist || !currentPlaylist.length) ensurePlaylistFromCatalog();
-      if (!currentPlaylist.length) return;
-      if (currentIndex + 1 < currentPlaylist.length) { currentIndex++; playTrack(currentPlaylist[currentIndex]); }
-      else if (wrap) { currentIndex = 0; playTrack(currentPlaylist[currentIndex]); }
-    });
+  // Si estamos en playlist, comportamiento normal:
+  if (isPlaylist && currentPlaylist.length) {
+    if (currentIndex + 1 < currentPlaylist.length) {
+      currentIndex++;
+      playTrack(currentPlaylist[currentIndex]);
+    }
+    return;
+  }
+
+  // 🎯 Modo Radio (contenido.html) → aleatorio continuo
+  if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length > 1) {
+
+    let nueva;
+    const actual = audio.src.split('/').pop();
+
+    do {
+      nueva = window.cancionesCatalogo[Math.floor(Math.random() * window.cancionesCatalogo.length)];
+    } while (nueva && nueva.ruta.split('/').pop() === actual);
+
+    isPlaylist = false; // aseguramos modo radio
+    playTrack(nueva);
+  }
+});
+
 
     prevBtn.addEventListener('click', () => {
-      if (!isPlaylist || !currentPlaylist.length) ensurePlaylistFromCatalog();
-      if (!currentPlaylist.length) return;
-      if (currentIndex - 1 >= 0) { currentIndex--; playTrack(currentPlaylist[currentIndex]); }
-      else if (wrap) { currentIndex = currentPlaylist.length - 1; playTrack(currentPlaylist[currentIndex]); }
-      else { audio.currentTime = 0; }
-    });
+
+  // Si estamos en playlist → comportamiento normal:
+  if (isPlaylist && currentPlaylist.length) {
+    if (audio.currentTime > 2) {
+      audio.currentTime = 0;
+    } else if (currentIndex > 0) {
+      currentIndex--;
+      playTrack(currentPlaylist[currentIndex]);
+    }
+    return;
+  }
+
+  // 🎯 Modo Radio
+  if (audio.currentTime > 2) {
+    audio.currentTime = 0;
+    return;
+  }
+
+  // si hay historial, retrocede
+  if (radioHistory.length > 1) {
+    // quitar la actual
+    radioHistory.pop();
+    const anterior = radioHistory[radioHistory.length - 1];
+    playTrack(anterior);
+  } else {
+    audio.currentTime = 0;
+  }
+});
+
 
     // volumen
     if (volumenControl && audio) {
