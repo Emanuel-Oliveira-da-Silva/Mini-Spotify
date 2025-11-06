@@ -195,6 +195,8 @@ const cancionesCatalogo = [
 
 ];
 
+window.cancionesCatalogo = cancionesCatalogo;
+
 // Función para cargar canciones en una sección específica
 function cargarCancionesEnSeccion(seccionId, seccionNombre) {
   const seccion = document.getElementById(seccionId);

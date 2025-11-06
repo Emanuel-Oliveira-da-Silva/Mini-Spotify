@@ -309,7 +309,7 @@ inputBuscarMini.addEventListener("input", () => {
 
 function mostrarMiniCanciones(query="") {
   listaMini.innerHTML = "";
-  (window.cancionesCatalogo || [])
+  cancionesCatalogo
     .filter(c => (c.titulo||'').toLowerCase().includes((query||'').toLowerCase()))
     .forEach(c => {
       const div = document.createElement("div");
