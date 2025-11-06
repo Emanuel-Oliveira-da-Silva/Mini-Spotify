@@ -209,7 +209,7 @@ app.get('/', (req, res) => {
 app.get('/ping', (_, res) => res.send('pong'));
 
 // --- Start ---
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Servidor en http://localhost:${PORT}`);
   console.log(`DB => ${DB_PATH}`);
