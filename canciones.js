@@ -17,7 +17,7 @@ const cancionesCatalogo = [
     titulo: "MAX-Checklist (feat. Chromeo) / MAX",
     ruta: "Canciones/MAX/checklist/MAX-Checklist (feat. Chromeo)(Official Video).mp3",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2732ca4c8a4020a39f64ba41f64",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW5WRVJIWR79hEDsbOEeI2EtkVV7sVsNyckw&s",
     seccion: "tendencia",
   },
   {
@@ -38,14 +38,14 @@ const cancionesCatalogo = [
     ruta: "Canciones/FUNK/Tu cha cha_ Brazil Funk Beat.mp3",
     titulo: "Tu cha cha / Brazil Funk Beat",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273703320414ddafd5c3c18a982",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9a7cRNt8rk05wME95v7wvLVv00SB7S1s2sg&s",
     seccion: "batidas",
   },
   {
     ruta: "Canciones/FUNK/Tuzera& (fest. Hatsune Miku)  Himitsu Da Yo - (Sub. Español & Lyrics).mp3",
     titulo: "Himitsu Da Yo / Tuzera & (fest. Hatsune Miku)",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2732df7794f1d8cfdac00351164",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOmLpM-gXEfxzhQbH4M_E1lRWErLu28iVYuQ&s",
     seccion: "batidas",
   },
   {
@@ -106,7 +106,7 @@ const cancionesCatalogo = [
     ruta: "Canciones/DJ FKU/TOMA NO BAILAO/TOMA NO BAILAO.mp3",
     titulo: "TOMA NO BAILAO / DJ FKU",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273d8c467a3e053f69d118873a1",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9RlNGKLHTbpe0MO2OVjig4tTz5TM3knsnmg&s",
     seccion: "batidas",
   },
   {
@@ -232,7 +232,7 @@ const cancionesCatalogo = [
     ruta: "Canciones/原口沙輔/Medicine (イガク).mp3",
     titulo: "Medicine (イガク) / 原口沙輔",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273f183e89919d7af2c00da9d83",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtW6VkOGy2hbL4zaT6vrARqh1fhtnwFrpn4A&s",
     seccion: "jpop",
   },
   {
@@ -246,35 +246,35 @@ const cancionesCatalogo = [
     ruta: "Canciones/アイナ・ジ・エンド/AiNA THE END - Katsubou.mp3",
     titulo: "Katsubou / アイナ・ジ・エンド",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b27335e350b6d90d5dfce10d18de",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuAX7YaMLxQtW1eR3WNADCJwwYFTirKby_Fg&s",
     seccion: "jpop",
   },
   {
     ruta: "Canciones/ADO/Aishite Aishite Aishite.mp3",
     titulo: "Aishite Aishite Aishite / ADO",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273f5912abed0ea22e746552771",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqmymcYl7SgB3pselZtSnuYP8QNPE2-3aK_Q&s",
     seccion: "jpop",
   },
   {
     ruta: "Canciones/ハナエ/Kamisama Hajimemashita.mp3",
     titulo: "Kamisama Hajimemashita / ハナエ",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2737dc535692414fb8c5c13a9c1",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7GCjmJj6haaK-bybxBRFHD7xoFrZWmFwshQ&s",
     seccion: "jpop",
   },
   {
     ruta: "Canciones/アイナ・ジ・エンド/アイナジエンド  革命道中 - On The Way.mp3",
     titulo: "革命道中 - On The Way / アイナ・ジ・エンド",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b27335e350b6d90d5dfce10d18de",
+      "https://cdn-images.dzcdn.net/images/cover/7cb3e0610479410d8a6bb5a5a33ddb48/0x1900-000000-80-0-0.jpg",
     seccion: "jpop",
   },
   {
     ruta: "Canciones/Miki Matsubara/真夜中のドアStay With Me.mp3",
     titulo: "真夜中のドアStay With Me / Miki Matsubara",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b27387a9458833df6cea79713fc7",
+      "https://www.ponycanyon.co.jp/images/wcms/accessor/bin/jacket/PCSP000006271.jpg?size=4&order=1",
     seccion: "jpop",
   },
   {
@@ -288,35 +288,35 @@ const cancionesCatalogo = [
     ruta: "Canciones/Skee-lo/Skee-Lo - I Wish (Official Video) [ryDOy3AosBw].mp3",
     titulo: "I Wish / Skee-lo",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2735e2bca5e5a3f48064f2300be",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXGEhzcY18b3Fv06iq_0QiIqQ2zw4IQl73eA&s",
     seccion: "hiphop",
   },
   {
     ruta: "Canciones/Bell Bin Devoe/BELL BIV DEVOE POISON.mp3",
     titulo: "Poison / Bell Bin Devoe",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273fbbd1a631e4908f0a9be841e",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz6QFbdcR3ZJK5aKCnb5t4TVBiohM9R9WI6A&s",
     seccion: "hiphop",
   },
   {
     ruta: "Canciones/Bobby Caldwell/What You Won't Do for Love.mp3",
     titulo: "What You Won't Do for Love / Bobby Caldwell",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273922defaf8c87b808c462e7c0",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTg2ih7CoWEN0UKm-Ayy11s2limn3X58zM4WA&s",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Frank Sinatra/My Way (2008 Remastered).mp3",
     titulo: "My Way / Frank Sinatra",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273b81d66d1416afa139d12767b",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1IeBv76JRJNoSpLGYuKcNe6YHCndxyzHE6A&s",
     seccion: "Vocal",
   },
   {
     ruta: "Canciones/Frank Sinatra/Fly Me To The Moon (2008 Remastered).mp3",
     titulo: "Fly Me To The Moon / Frank Sinatra",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273b81d66d1416afa139d12767b",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1IeBv76JRJNoSpLGYuKcNe6YHCndxyzHE6A&s",
     seccion: "Vocal",
   },
   {
@@ -330,140 +330,140 @@ const cancionesCatalogo = [
     ruta: "Canciones/Michael Bublé/Sway.mp3",
     titulo: "Sway / Michael Bublé",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273b732a522a686bb304a5d3fdf",
+      "https://cdn-images.dzcdn.net/images/cover/2179e887275299a75aaec5eaa7f1f38f/0x1900-000000-80-0-0.jpg",
     seccion: "Vocal",
   },
   {
     ruta: "Canciones/Michael Bublé/Feeling Good.mp3",
     titulo: "Feeling Good / Michael Bublé",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2735d7d966732bd44ac2a13b614",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeRl5Y0Qb4lzwuo2ftUyfojvsKlMbHNuI9Og&s",
     seccion: "Vocal",
   },
   {
     ruta:"Canciones/Frank Sinatra/The World We Knew (Over And Over).mp3",
     titulo: "The World We Knew (Over And Over) / Frank Sinatra",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2733e2331ff09f59ea3c87fe5d6",
+      "https://cdn-images.dzcdn.net/images/cover/c00cb7eb2445c1da5b6de6be8ea8b241/1900x1900-000000-81-0-0.jpg",
     seccion: "Vocal",
   },
   {
     ruta:"Canciones/Mariana Froes/Mari Froes - Espelho (Lyric Video).mp3",
     titulo: "Espelho / Mariana Froes",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273b2726b2a47d37ec462877953",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL5JEPxfSOtgPM0HFAJ4osizArXCvNk6lerw&s",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Mariana Froes/Mari Froes - Moça.mp3",
     titulo: "Moça / Mariana Froes",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273cc90015876bdf60d02be0f36",
+      "https://cdn-images.dzcdn.net/images/cover/49f95ece2d07cbba4ff34e59334e799a/0x1900-000000-80-0-0.jpg",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Murart/Murart e Revna- Samba Paixão (Clipe Oficial).mp3",
     titulo: "Samba Paixão / Murart",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273f9d21b10e69ae918e7e879a0",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN9vg1PfZsR8IKFv61JnybK95NfBLjXgCTXQ&s",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Mariana Froes/Mari Froes - Figa De Guiné (Official Video).mp3",
     titulo: "Figa De Guiné / Mariana Froes",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273f0123fd6c668a3065d97b7fd",
+      "https://cdn-images.dzcdn.net/images/cover/1144a7a5c79de9c2bc93ede617ca7476/0x1900-000000-80-0-0.jpg",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Tom Jobin/Garota De Ipanema.mp3",
     titulo: "Garota De Ipanema / Tom Jobin",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d00001e02fa4cdef55debc2f9c79b75c6",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_IqKhpue1lztb-1GyezKc350664X5KiAeUw&s",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Barbatuques/Baianá.mp3",
     titulo: "Baianá / Barbatuques",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273fc7ce3acfa2e8c2479bcf621",
+      "https://i1.sndcdn.com/artworks-cuvrCwMyDMbUCCEy-e4UlrA-t500x500.jpg",
     seccion: "Samba",
   },
   {
     ruta: "Canciones/Harry James/It's Been A Long Long Time.mp3",
     titulo: "It's Been A Long Long Time / Harry James",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273088bd566df587707d14bb5bb",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuaUtiZvBL7KNLAXr9-WDsK7G9rvyLYL83TQ&s",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Louis Armstrong/La vie en rose.mp3",
     titulo: "La vie en rose / Louis Armstrong",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273ce4c83c6514608bb1a597c76",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu3JQlpH0hVwGanowSSk_tWMhITkTlK4FsRQ&s",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Grover Washington,jr/Just the Two of Us (feat. Bill Withers).mp3",
     titulo: "Just the Two of Us / Grover Washington,jr",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273472fbc1d5743c7d3c75b9ec0",
+      "https://upload.wikimedia.org/wikipedia/en/6/64/Just_the_Two_of_Us_single.jpg",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Michael Bublé/Michael Bublé - L.O.V.E. [Official Audio].mp3",
     titulo: "L.O.V.E. / Michael Bublé",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273d72cafc06acc89d30bf6093a",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDrm2Qta4tWSg6u14xzp5_6tTN-s87i3B3OQ&s",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Dean Martin/Dean Martin - Everybody Loves Somebody (Official Audio).mp3",
     titulo: "Everybody Loves Somebody / Dean Martin",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273c42d497351d85d00188cf5d5",
+      "https://upload.wikimedia.org/wikipedia/en/0/05/Everybody_Loves_Somebody_%28album%29.jpg",
     seccion: "Vocal",
   },
   {
     ruta: "Canciones/Bobby Darin/Beyond the Sea.mp3",
     titulo: "Beyond the Sea / Bobby Darin",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273dd5593f99402c3c85f67af22",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXFXU0NuHugJku3ob0Rj_eZg2tSK506-hdGA&s",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Frank Sinatra/My Way Of Life.mp3",
     titulo: "My Way Of Life / Frank Sinatra",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273a0209db6a0a102cae469d4f9",
+      "https://cdn-images.dzcdn.net/images/cover/c00cb7eb2445c1da5b6de6be8ea8b241/1900x1900-000000-81-0-0.jpg",
     seccion: "Vocal",
   },
   {
     ruta: "Canciones/Sade/Smooth Operator.mp3",
     titulo: "Smooth Operator / Sade",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2735e25e034e25258b356774c79",
+      "https://upload.wikimedia.org/wikipedia/en/1/1d/Sade_-_Smooth_Operator.png",
     seccion: "Jazz",
   },
   {
     ruta: "Canciones/Michael Jackson/Rock With You [aCjxP58Ydik].mp3",
     titulo: "Rock With You / Michael Jackson",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2737027294551db4fda68b5ddac",
+      "https://i.discogs.com/XGX6AQc8kB9t4129pnt4iwh7m5EPpYv2o6wpnAMtNxE/rs:fit/g:sm/q:90/h:568/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTUzMjc0/Mi0xMzg1MjIwNzQy/LTIwNDYuanBlZw.jpeg",
     seccion: "funk",
   },
   {
     ruta: "Canciones/carl carlton/She's A Bad Mama Jama (She's Built, She's Stacked).mp3",
     titulo: "She's A Bad Mama Jama / carl carlton",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273de341c04cfbdaac04548ff4f",
+      "https://m.media-amazon.com/images/I/51XZobhnQSL._UF1000,1000_QL80_.jpg",
     seccion: "funk",
   },
   {
     ruta: "Canciones/Marcos Valle/Estrelar.mp3",
     titulo: "Estrelar / Marcos Valle",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273580d01637ff3bb5f27206d41",
+      "https://s.mxmcdn.net/images-storage/albums/5/9/5/1/5/7/26751595_350_350.jpg",
     seccion: "funk",
   },
   {
@@ -477,77 +477,77 @@ const cancionesCatalogo = [
     ruta: "Canciones/The Brothers Jonhson/Stomp!.mp3",
     titulo: "Stomp! / The Brothers Jonhson",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273b3dd4b1619bac722e29c7624",
+      "https://m.media-amazon.com/images/M/MV5BNjY4ZTZkYzUtMjAzNS00ZDYxLTgwZmItN2YzOTRjNjVmZmJmXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
     seccion: "funk",
   },
   {
     ruta: "Canciones/The Emotions/Best of My Love.mp3",
     titulo: "Best of My Love / The Emotions",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d00001e020b63ed1959e7bf87e82f0726",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKOsrKlF7yPgt-VTJO0PeFpsJ6JCRDoMmSmQ&s",
     seccion: "funk",
   },
   {
     ruta: "Canciones/Cheryl Lynn/Got to Be Real.mp3",
     titulo: "Got to Be Real / Cheryl Lynn",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273c0e98d7c48b548f1a3833368",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJSpv0FSm7AHLI4fZZxauXSR3orHsZfE-bDg&s",
     seccion: "funk",
   },
   {
     ruta: "Canciones/A K I N A/Estrelar (Remix).mp3",
     titulo: "Estrelar (Remix) / A K I N A",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273c673a1da9dd9688f1e48a50b",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOkFK0DvT-3fgsLD9d8B7-YTufSJl2p-Ajdg&s",
     seccion: "funk",
   },
   {
     ruta: "Canciones/Michael Jackson/Remember the Time.mp3",
     titulo: "Remember the Time / Michael Jackson",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b2733b9f8b18cc685e1502128aa8",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBj46TvtOpMGtcullD895D60KAxTJkMtbngw&s",
     seccion: "funk",
   },
   {
     ruta: "Canciones/Michael Jackson/P.Y.T. (Pretty Young Thing).mp3",
     titulo: "P.Y.T. (Pretty Young Thing) / Michael Jackson",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273de437d960dda1ac0a3586d97",
+      "https://i.discogs.com/XGX6AQc8kB9t4129pnt4iwh7m5EPpYv2o6wpnAMtNxE/rs:fit/g:sm/q:90/h:568/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTUzMjc0/Mi0xMzg1MjIwNzQy/LTIwNDYuanBlZw.jpeg",
     seccion: "funk",
   },
   {
     ruta: "Canciones/Cardi B/Please Me(Feat. Bruno Mars).mp3",
     titulo: "Please Me(feat. Bruno Mars) / Cardi B ",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273288883647008cefba0db5402",
+      "https://upload.wikimedia.org/wikipedia/en/4/43/Cardi_B_and_Bruno_Mars_-_Please_Me.png",
     seccion: "hiphop",
   },
   {
     ruta: "Canciones/Bruno-Mars/Smokin Out The Window.mp3",
     titulo: "Smokin Out The Window / Bruno Mars",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273ca1fa2ec5795f48e610dc058",
+      "https://http2.mlstatic.com/D_NQ_NP_699909-MLU70529742877_072023-O.webp",
     seccion: "pop",
   },
   {
     ruta: "Canciones/Bruno-Mars/After Last Night (with Thundercat & Bootsy Collins).mp3",
     titulo: "After Last Night (with Thundercat & Bootsy Collins) / Bruno Mars",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273ca1fa2ec5795f48e610dc058",
+      "https://http2.mlstatic.com/D_NQ_NP_699909-MLU70529742877_072023-O.webp",
     seccion: "tendencia",
   },
   {
     ruta: "Canciones/Bruno-Mars/Lady Gaga, Bruno Mars - Die With A Smile (Official Music Video).mp3",
     titulo: "Die With A Smile / Bruno Mars & Lady Gaga",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b27382ea2e9e1858aa012c57cd45",
+      "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Lady_Gaga_and_Bruno_Mars_-_Die_with_a_Smile.png/250px-Lady_Gaga_and_Bruno_Mars_-_Die_with_a_Smile.png",
     seccion: "pop",
   },
   {
     ruta: "Canciones/FUNK/É o Pombo, É o Neymar, Vinícius Jr E Paquetá (Copa do Mundo 2022).mp3",
     titulo: "É o Pombo, É o Neymar, Vinícius Jr E Paquetá / Dj Dollynho da Lapa",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d0000b273bb92d2a16cea15b35c007ecc",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsEhbx65BKxgUlHQhdYzyfJS5SvMyNk6-iEw&s",
     seccion: "batidas",
   },
   {
@@ -561,14 +561,14 @@ const cancionesCatalogo = [
     ruta: "Canciones/FUNK/Jogadinha do Paqueta.mp3",
     titulo: "Jogadinha do Paqueta / MC RF",
     thumbnail:
-      "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8451f4324c753ccebc9641e6a8",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfqxxL8ej6tkSxO-T2ob0Jh5yxb07GzmpAPA&s",
     seccion: "batidas",
   },
   {
     ruta: "Canciones/FUNK/Vou Passar Sarrando.mp3",
     titulo: "Vou Passar Sarrando / MC BF",
     thumbnail:
-      "https://i.scdn.co/image/ab67616d00001e0215a66d2532938b3086cfb97b",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaJd6ifvTY1x6s5tBA4QZneLddr9hUT2GS1Q&s",
     seccion: "batidas",
   }
 ];
