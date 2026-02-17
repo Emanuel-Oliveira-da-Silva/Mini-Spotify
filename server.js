@@ -1,4 +1,5 @@
 // server.js
+require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
@@ -44,6 +45,14 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 `);
 
 const app = express();
+const helmet = require("helmet");
+app.use(helmet());
+const rateLimit = require("express-rate-limit");
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200
+}));
 app.use(cors()); // en prod, restringir orígenes
 app.use(bodyParser.json({ limit: "2mb" }));
 
