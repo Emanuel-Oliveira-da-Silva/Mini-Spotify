@@ -46,7 +46,21 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 
 const app = express();
 const helmet = require("helmet");
-app.use(helmet());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "img-src": ["'self'", "data:", "https:"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+
 const rateLimit = require("express-rate-limit");
 
 app.use(rateLimit({
