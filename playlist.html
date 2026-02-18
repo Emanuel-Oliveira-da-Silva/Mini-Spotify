@@ -681,6 +681,13 @@
           // Pointer-based drag (works for mouse and touch) - smooth ghost + placeholder
           row.addEventListener('pointerdown', (ev) => {
             if (!document.body.classList.contains('reorder-mode')) return;
+
+            // ✅ Si el target es un botón (eliminar u otros), no hacer drag
+            if (ev.target.closest('button')) return;
+
+            if (ev.button && ev.button !== 0) return; // only primary
+            ev.preventDefault();
+            if (!document.body.classList.contains('reorder-mode')) return;
             if (ev.button && ev.button !== 0) return; // only primary
             ev.preventDefault();
 
