@@ -288,8 +288,53 @@
         let currentIndex = 0;
         let isPlaylist = false;
         let wrap = false;
+        let nextIndex = 0;    // índice de la siguiente canción
+        let _shuffle = false; // shuffle ON/OFF
 
         // helpers
+
+        function siguienteIndexPlaylist() {
+          const n = currentPlaylist.length;
+          if (!n) return -1;
+
+          if (window._playlistShuffle && window._playlistOrdenShuffle.length) {
+            const idxShuffle = window._playlistOrdenShuffle.indexOf(currentIndex);
+            return window._playlistOrdenShuffle[(idxShuffle + 1) % n];
+          } else {
+            return (currentIndex + 1) % n;
+          }
+        }
+
+        // Calcula y actualiza la variable `nextIndex` según el estado de shuffle
+        function actualizarProximaCancion() {
+          const n = currentPlaylist.length;
+          if (!n) {
+            nextIndex = -1;
+            return;
+          }
+
+          // Si hay shuffle activado desde la playlist (enviado por postMessage)
+          if (window._playlistShuffle) {
+            if (Array.isArray(window._playlistOrdenShuffle) && window._playlistOrdenShuffle.length) {
+              const idxShuffle = window._playlistOrdenShuffle.indexOf(currentIndex);
+              // siguiente en el orden shuffle (envuelve)
+              nextIndex = window._playlistOrdenShuffle[(idxShuffle + 1) % n];
+            } else {
+              // fallback: elegir aleatorio distinto al actual
+              let rnd;
+              do {
+                rnd = Math.floor(Math.random() * n);
+              } while (rnd === currentIndex && n > 1);
+              nextIndex = rnd;
+            }
+          } else {
+            // shuffle desactivado: siguiente lineal, sin wrap cuando llega al final
+            if (currentIndex + 1 < n) nextIndex = currentIndex + 1;
+            else nextIndex = -1; // indica que no hay siguiente automáticamente
+          }
+        }
+
+
         function fmtTitle(track) {
           const t = (track?.titulo || "(sin título)").trim();
           const a = (track?.artista || "").trim();
@@ -385,6 +430,8 @@
           );
           isPlaylist = true;
           playTrack(currentPlaylist[currentIndex]);
+          // calcular próxima canción según estado shuffle/orden enviado
+          actualizarProximaCancion();
         }
 
         // --- audio events ---
@@ -408,51 +455,40 @@
         });
 
         audio.addEventListener("ended", () => {
-          if (isPlaylist) {
-            currentIndex++;
-            if (currentIndex < currentPlaylist.length) {
-              playTrack(currentPlaylist[currentIndex]);
+            if (isPlaylist && currentPlaylist.length) {
+              // Si nextIndex válido, avanzamos y reproducimos
+              if (typeof nextIndex === 'number' && nextIndex >= 0 && nextIndex < currentPlaylist.length) {
+                currentIndex = nextIndex;
+                playTrack(currentPlaylist[currentIndex]);
+                // recalcular siguiente
+                actualizarProximaCancion();
+              } else {
+                // No hay siguiente automático (fin de playlist en modo no-shuffle)
+                audio.pause();
+              }
             } else {
-              isPlaylist = false;
-              tituloDiv.textContent = "Fin de la playlist";
-              sub.textContent = "";
-            }
-          } else {
-            // Si hay forward en el historial (por ejemplo porque el usuario retrocedió antes), respeta eso
-            if (radioIndex < radioHistory.length - 1) {
-              radioIndex++;
-              const siguiente = radioHistory[radioIndex];
-              playTrack(siguiente, { fromHistory: true });
-              return;
-            }
+              // --- modo radio ---
+              if (radioIndex < radioHistory.length - 1) {
+                  // si hay forward en historial
+                  radioIndex++;
+                  playTrack(radioHistory[radioIndex], { fromHistory: true });
+                  return;
+              }
 
-            // Si no hay forward, generamos aleatorio nuevo
-            if (
-              Array.isArray(window.cancionesCatalogo) &&
-              window.cancionesCatalogo.length > 0
-            ) {
-              const actual = audio.src.split("/").pop();
-              let nueva;
-              do {
-                nueva =
-                  window.cancionesCatalogo[
-                    Math.floor(Math.random() * window.cancionesCatalogo.length)
-                  ];
-              } while (nueva && nueva.ruta.split("/").pop() === actual);
+              // generar nueva canción aleatoria, distinta a la actual
+              if (Array.isArray(window.cancionesCatalogo) && window.cancionesCatalogo.length > 1) {
+                  const actual = audio.src.split("/").pop();
+                  let nueva;
+                  do {
+                      nueva = window.cancionesCatalogo[Math.floor(Math.random() * window.cancionesCatalogo.length)];
+                  } while (nueva && nueva.ruta.split("/").pop() === actual);
 
-              isPlaylist = false;
-              playTrack({
-                titulo: nueva.titulo,
-                artista: nueva.artista || "",
-                ruta: nueva.ruta,
-                thumbnail: nueva.thumbnail || "",
-              });
-            } else {
-              tituloDiv.textContent = "No hay canciones disponibles.";
-              sub.textContent = "";
-            }
+                  isPlaylist = false;
+                  playTrack(nueva);
+              }
           }
-        });
+      });
+
 
         audio.addEventListener("error", () => {
           console.error("audio error", audio.error);
@@ -514,10 +550,18 @@
         nextBtn.addEventListener("click", () => {
           // Si estamos en playlist, comportamiento normal:
           if (isPlaylist && currentPlaylist.length) {
-            if (currentIndex + 1 < currentPlaylist.length) {
-              currentIndex++;
-              playTrack(currentPlaylist[currentIndex]);
+            const n = currentPlaylist.length;
+            // Si hay shuffle activado por la playlist, usar el orden shuffle (envuelve)
+            if (window._playlistShuffle) {
+              currentIndex = siguienteIndexPlaylist();
+            } else {
+              // Sin shuffle: avanzar, y si estamos al final -> ir a la primera
+              if (currentIndex + 1 < n) currentIndex++;
+              else currentIndex = 0;
             }
+            playTrack(currentPlaylist[currentIndex]);
+            // recalcular siguiente
+            actualizarProximaCancion();
             return;
           }
 
@@ -649,17 +693,34 @@
           }
           // data.playlist: array de tracks + data.index: número
           if (Array.isArray(data.playlist) && typeof data.index === "number") {
-            currentPlaylist = data.playlist
-              .map((t) => ({
-                titulo: t?.titulo || "",
-                artista: t?.artista || "",
-                ruta: t?.ruta || "",
-                thumbnail: t?.thumbnail || "",
-              }))
-              .filter((t) => t.ruta);
-            if (!currentPlaylist.length) return;
-            playFromPlaylist(data.index);
+            // Comparar playlists por rutas para detectar cambios reales
+            const incomingRutas = (data.playlist || []).map((t) => String(t.ruta || "").trim()).join("|::|");
+            const currentRutas = (currentPlaylist || []).map((t) => String(t.ruta || "").trim()).join("|::|");
+            const playlistChanged = incomingRutas !== currentRutas;
+            const indexChanged = typeof data.index === 'number' && data.index !== currentIndex;
+
+            // Actualizar la playlist interna (no tocaremos currentIndex a menos que realmente haya que reproducir otra canción)
+            currentPlaylist = data.playlist;
+
+            // Guardar estado shuffle
+            isPlaylist = true;
+            const prevShuffle = !!window._playlistShuffle;
+            window._playlistShuffle = !!data.shuffle;
+            window._playlistOrdenShuffle = Array.isArray(data.ordenShuffle) ? data.ordenShuffle : [];
+
+            // Si la playlist o el índice cambiaron (es decir, el usuario pidió reproducir otra canción), reproducirla.
+            // En cambios de solo 'shuffle' no reproducimos para evitar reiniciar la canción actual.
+            if (playlistChanged || indexChanged) {
+              // si el índice es válido, reproducir
+              if (typeof data.index === 'number' && data.index >= 0 && data.index < currentPlaylist.length) {
+                playFromPlaylist(data.index);
+              }
+            } else {
+              // Solo recalcular la próxima canción según el nuevo estado (sin reiniciar la actual)
+              actualizarProximaCancion();
+            }
           }
+
         });
 
         // resize parent frameset row to fit this content

@@ -163,6 +163,33 @@
       div {
         color: white;
       }
+
+      /* shuffle circular */
+#btnShuffle {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: none;
+  margin-left: 47%;
+  background: #2a2a2a;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* estado activo */
+#btnShuffle.activo {
+  background: #1db954;
+  color: black;
+  transform: scale(1.08);
+}
+
+/* feedback táctil */
+#btnShuffle:active{
+  transform: scale(0.96);
+}
+
     </style>
   </head>
   <body class="main">
@@ -181,6 +208,7 @@
     </div>
 
     <button id="btnAgregarCancion">+ Agregar canción</button>
+    <button id="btnShuffle">🔀</button>
 
     <div id="miniCanciones">
       <input
@@ -207,10 +235,17 @@
       const tituloEl = document.getElementById("tituloPlaylist");
       const listaEl = document.getElementById("listaCanciones");
       const noti = document.getElementById("notificacion");
+      let currentIndex = 0;
+      let nextIndex = 0;
+      let _shuffle = false; // estado local para compatibilidad
+
+
 
       let estado = {
         playlist: null, // {id,nombre,created_at}
         canciones: [], // [{id,titulo,artista,ruta,duration,orden}]
+        shuffle: false, // estado shuffle ON/OFF
+        ordenShuffle: [] // orden actual de canciones para shuffle (array de índices)
       };
 
       // ======= Helpers UI =======
@@ -220,22 +255,75 @@
         setTimeout(() => (noti.style.opacity = "0"), 1800);
       }
 
-      // Reproducir canción en el reproductor (frame inferior)
-      function reproducir(index) {
-        if (!estado.canciones?.length) return;
-        const payload = {
-          playlist: estado.canciones.map((c) => ({
-            titulo: c.titulo,
-            artista: c.artista,
-            ruta: c.ruta,
-            thumbnail: c.thumbnail || "",
-          })),
-          index,
-        };
-        if (parent?.frames?.reproductorFrame) {
-          parent.frames["reproductorFrame"].postMessage(payload, "*");
+      // Devuelve el índice de la próxima canción sin alterar la actual
+      function actualizarProximaCancion() {
+        const n = estado.canciones.length;
+        if (!n) return;
+
+        // Usar el índice real del reproductor
+        const realIndex = playlistActualIndex();
+
+        if (_shuffle) {
+          let rnd;
+          do {
+            rnd = Math.floor(Math.random() * n);
+          } while (rnd === realIndex && n > 1);
+          nextIndex = rnd;
+        } else {
+          nextIndex = (realIndex + 1) % n;
         }
       }
+
+
+
+
+
+
+
+
+
+      // Reproducir canción en el reproductor (frame inferior)
+      function reproducir(index, preservarActual = false) {
+  if (!estado.canciones?.length) return;
+
+  if (!preservarActual) {
+    currentIndex = index; // ⚡ Actualizamos currentIndex
+    actualizarProximaCancion();
+  }
+
+  const payload = {
+    playlist: estado.canciones.map((c) => ({
+      titulo: c.titulo,
+      artista: c.artista,
+      ruta: c.ruta,
+      thumbnail: c.thumbnail || "",
+    })),
+    index: currentIndex,
+    shuffle: estado.shuffle,
+    ordenShuffle: estado.ordenShuffle
+  };
+
+  if (parent?.frames?.reproductorFrame) {
+    parent.frames["reproductorFrame"].postMessage(payload, "*");
+  }
+}
+
+
+
+
+
+
+      // Generar orden aleatorio de índices para shuffle
+      function generarShuffleIndices(length) {
+        const arr = Array.from({ length }, (_, i) => i);
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+
 
       // Render canciones
       function renderCanciones() {
@@ -273,6 +361,7 @@
             fontWeight: "bold",
             cursor: "pointer",
           });
+
           btnDel.addEventListener("click", async (e) => {
             e.stopPropagation();
             try {
@@ -315,9 +404,8 @@
           const r = await api.getPl(pid); // { playlist, canciones }
           estado.playlist = r.playlist;
           estado.canciones = r.canciones || [];
-          tituloEl.textContent = estado.playlist?.nombre || "Playlist";
 
-          // 🔧 Reparar canciones sin thumbnail usando el catálogo local
+          // Reparar thumbnails
           estado.canciones = estado.canciones.map((c) => {
             if (!c.thumbnail) {
               const match = cancionesCatalogo.find(
@@ -328,12 +416,26 @@
             return c;
           });
 
+          // Mantener estado de shuffle previo; si está activo y no hay orden, generarla
+          if (estado.shuffle) {
+            if (!Array.isArray(estado.ordenShuffle) || estado.ordenShuffle.length !== estado.canciones.length) {
+              estado.ordenShuffle = generarShuffleIndices(estado.canciones.length);
+            }
+            btnShuffle.classList.add("activo");
+          } else {
+            estado.ordenShuffle = estado.ordenShuffle || [];
+            btnShuffle.classList.remove("activo");
+          }
+
+
+          tituloEl.textContent = estado.playlist?.nombre || "Playlist";
           renderCanciones();
         } catch (e) {
           alert(e?.error || "Error al cargar la playlist");
           location.href = "contenido.html";
         }
       }
+
 
       // ======= Volver =======
       document.getElementById("btn-volver").addEventListener("click", () => {
@@ -375,6 +477,66 @@
             alert(e?.error || "Error al renombrar");
           }
         });
+
+
+      // ======= Shuffle ON/OFF =======
+      const btnShuffle = document.getElementById("btnShuffle");
+
+      function playlistActualIndex() {
+        if (!parent?.frames?.reproductorFrame) return 0;
+        const rep = parent.frames["reproductorFrame"]._debugPlayer;
+        if (!rep || !rep.currentPlaylist) return 0;
+
+        const actualRuta = rep.currentPlaylist[rep.currentIndex]?.ruta;
+        return estado.canciones.findIndex(c => c.ruta === actualRuta) || 0;
+      }
+
+
+      btnShuffle.addEventListener("click", () => {
+        estado.shuffle = !estado.shuffle;
+        _shuffle = estado.shuffle;
+
+        // Generar o limpiar ordenShuffle según estado
+        if (estado.shuffle) {
+          estado.ordenShuffle = generarShuffleIndices(estado.canciones.length);
+        } else {
+          estado.ordenShuffle = [];
+        }
+
+        btnShuffle.classList.toggle("activo", estado.shuffle);
+        toast(estado.shuffle ? "Shuffle activado" : "Shuffle desactivado");
+
+        // Obtener el índice real del reproductor
+        const realIndex = playlistActualIndex();
+
+        const payload = {
+          playlist: estado.canciones.map((c) => ({
+            titulo: c.titulo,
+            artista: c.artista,
+            ruta: c.ruta,
+            thumbnail: c.thumbnail || "",
+          })),
+          index: realIndex,
+          shuffle: estado.shuffle,
+          ordenShuffle: estado.ordenShuffle
+        };
+        if (parent?.frames?.reproductorFrame) {
+          parent.frames["reproductorFrame"].postMessage(payload, "*");
+        }
+        // recalcular próxima canción localmente usando el índice real
+        actualizarProximaCancion();
+      });
+
+
+
+
+
+
+
+
+
+
+
 
       // === REEMPLAZADO: Vaciar (usa api.clearPl) ===
       document.getElementById("vaciar").addEventListener("click", async () => {
