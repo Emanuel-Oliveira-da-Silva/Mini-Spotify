@@ -106,35 +106,29 @@
 
     /* ===== GRID MOBILE PRO ===== */
 @media (max-width: 600px) {
-  .seccion-canciones,
   .seccion-lista {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 👈 3 columnas */
-    gap: 10px;
+    display: flex;          /* 👈 volver a flex */
+    overflow-x: auto;       /* 👈 mantener scroll */
+    gap: 12px;
     padding: 10px;
   }
 
-  .cancion-wrapper,
-  .cancion {
-    width: 100%;
+  .cancion-wrapper {
+    flex: 0 0 auto;         /* 👈 CLAVE */
+    width: 110px;           /* 👈 tamaño móvil */
   }
 
   .cancion img {
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1; /* 👈 cuadrados perfectos */
+    aspect-ratio: 1 / 1;
   }
 
   .cancion p {
-    font-size: 12px; /* 👈 más compacto */
-  }
-
-  .btn-agregar {
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
+    font-size: 12px;
   }
 }
+
 
 
 /* ===== QUICK PLAYLISTS — estilo biblioteca ===== */
@@ -405,6 +399,24 @@ async function cargarQuickPlaylists() {
           `playlist.html?id=${pl.id}`;
       });
 
+      // 🖱️ click derecho (igual que biblioteca)
+card.addEventListener('contextmenu', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  try {
+    window.parent.postMessage({
+      type: 'open-playlist-context',
+      id: pl.id,
+      name: pl.nombre || '',
+      x: ev.clientX,
+      y: ev.clientY
+    }, '*');
+  } catch (e) {}
+});
+
+
+
       grid.appendChild(card);
     });
   } catch (e) {
@@ -421,6 +433,95 @@ async function cargarQuickPlaylists() {
         ].location.href = "biblioteca.html";
       });
 
+      // 🔥 escuchar creación de playlist desde el modal global
+// 🔥 escuchar mensajes del parent
+window.addEventListener('message', async (ev) => {
+  const d = ev.data || {};
+
+  // ==============================
+  // ✅ CREAR PLAYLIST
+  // ==============================
+  if (d.type === 'create-playlist') {
+    const nombre = (d.name || '').trim();
+
+    if (!nombre) {
+      ev.source.postMessage(
+        { type: 'create-playlist-result', ok: false, error: 'Nombre vacío' },
+        '*'
+      );
+      return;
+    }
+
+    try {
+      const res = await api.createPl(nombre);
+
+      ev.source.postMessage(
+        { type: 'create-playlist-result', ok: true, id: res.id },
+        '*'
+      );
+
+      await cargarQuickPlaylists();
+    } catch (e) {
+      ev.source.postMessage(
+        { type: 'create-playlist-result', ok: false, error: e.error || String(e) },
+        '*'
+      );
+    }
+  }
+
+  // ==============================
+  // 🖱️ ACCIONES DEL MENÚ CONTEXTUAL
+  // ==============================
+  if (d.type === 'playlist-action') {
+    const id = d.id;
+    const action = d.action;
+
+    if (!id || !action) return;
+
+    try {
+      if (action === 'rename') {
+        const nuevo = prompt('Nuevo nombre para la playlist', d.name || '');
+        if (!nuevo) {
+          ev.source.postMessage({
+            type: 'playlist-action-result',
+            ok: false,
+            error: 'Nombre vacío'
+          }, '*');
+          return;
+        }
+
+        await api.renamePl(id, nuevo);
+        await cargarQuickPlaylists();
+        ev.source.postMessage({ type: 'playlist-action-result', ok: true }, '*');
+
+      } else if (action === 'empty') {
+        if (!confirm('Vaciar la playlist? Esta acción no se puede deshacer.')) return;
+
+        await api.clearPl(id);
+        await cargarQuickPlaylists();
+        ev.source.postMessage({ type: 'playlist-action-result', ok: true }, '*');
+
+      } else if (action === 'delete') {
+        if (!confirm('Eliminar la playlist? Esta acción no se puede deshacer.')) return;
+
+        await api.delPl(id);
+        await cargarQuickPlaylists();
+        ev.source.postMessage({ type: 'playlist-action-result', ok: true }, '*');
+      }
+
+    } catch (err) {
+      console.error(err);
+      ev.source.postMessage({
+        type: 'playlist-action-result',
+        ok: false,
+        error: err?.error || String(err)
+      }, '*');
+    }
+  }
+});
+
+
+        window.addEventListener('focus', cargarQuickPlaylists);
         cargarQuickPlaylists();
 
     </script>
