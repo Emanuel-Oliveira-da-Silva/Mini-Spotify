@@ -2,7 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="style.css" />
     <title>Playlist</title>
     <style>
@@ -84,7 +84,7 @@
         padding-right: 8px;
         display: grid;
         grid-auto-rows: minmax(180px, auto);
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 22px 24px; /* row-gap col-gap */
         align-items: start;
         justify-items: center;
@@ -102,6 +102,8 @@
         border-radius: 10px;
         transition: transform 0.12s ease, box-shadow 0.12s ease;
         background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+        box-sizing: border-box;
+        width: 100%;
       }
 
       #listaMiniCanciones .cancion:hover {
@@ -110,8 +112,9 @@
       }
 
       #listaMiniCanciones .cancion img {
-        width: 110px;
-        height: 110px;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
         border-radius: 10px;
         object-fit: cover;
         display: block;
@@ -187,9 +190,9 @@
       /* Lista de canciones de la playlist */
       /* Lista de canciones de la playlist (grid responsive de columnas) */
       #listaCanciones {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 18px 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px 18px;
         align-items: start;
         padding: 18px 8px 28px 8px;
       }
@@ -204,16 +207,20 @@
         padding: 8px;
         cursor: pointer;
         position: relative;
+        min-width: 120px;
       }
 
       #listaCanciones .cancion img {
-        width: 110px;
-        height: 110px;
-        border-radius: 10px;
-        object-fit: cover;
-        display: block;
-        box-shadow: 0 6px 26px rgba(0,0,0,0.45);
-      }
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1/1;
+  max-width: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 6px 26px rgba(0,0,0,0.45);
+}
+
 
       #listaCanciones .cancion p {
         margin: 0;
@@ -342,16 +349,6 @@
         #buscarCancionMini { font-size: 16px; padding: 12px; }
       }
 
-      @media (max-width: 600px) {
-        /* Enlarge playlist grid thumbnails on mobile for better touch targets */
-        #listaCanciones .cancion img {
-          width: 160px;
-          height: 160px;
-        }
-        #listaCanciones .cancion p { font-size: 16px; }
-        .placeholder { height: 160px; }
-      }
-
       @media (min-width: 900px) {
         /* Desktop: más impacto visual */
         #miniCanciones {
@@ -403,6 +400,14 @@
 /* feedback táctil */
 #btnShuffle:active{
   transform: scale(0.96);
+}
+
+
+#listaCanciones .cancion > div {
+  position: relative;
+  width: 100%;
+  max-width: 120px;
+  box-sizing: border-box;
 }
 
     </style>
