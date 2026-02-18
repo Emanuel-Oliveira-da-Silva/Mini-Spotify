@@ -1,3 +1,8 @@
+ACTUALIZACION 2026:
+Seguí el proyecto por mi cuenta y lo refiné más, logre hostearlo en 2 plataformas diferentes, ngrok (ya cerrada), y por render :) no es necesario descargar el ZIP
+
+link: https://mini-spotify-pa2w.onrender.com/
+
 Integrantes de grupo:
 Stefano Iacovone
 Franco de Acha
