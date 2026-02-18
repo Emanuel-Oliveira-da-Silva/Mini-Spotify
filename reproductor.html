@@ -2,7 +2,8 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Reproductor</title>
+  <title>Reproductor</title>
+  <meta name="theme-color" content="#1db954">
     <style>
       :root {
         --verde: #1db954;
@@ -354,6 +355,136 @@
             track?.thumbnail ||
             'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88"><rect fill="%231a1a1a" width="100%" height="100%"/></svg>';
         }
+
+        // --- Media Session & theme helpers ---
+        function rgbToHex(r, g, b) {
+          return (
+            "#" +
+            [r, g, b]
+              .map((x) => {
+                const h = x.toString(16);
+                return h.length === 1 ? "0" + h : h;
+              })
+              .join("")
+          );
+        }
+
+        // Try to compute a dominant/average color from the thumbnail image.
+        // If cross-origin prevents canvas reading, fallback to default.
+        async function dominantColorFromImage(imgSrc) {
+          return new Promise((resolve) => {
+            if (!imgSrc) return resolve(getComputedStyle(document.documentElement).getPropertyValue('--verde') || '#1db954');
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = imgSrc;
+            const timeout = setTimeout(() => resolve('#1db954'), 800);
+            img.onload = () => {
+              try {
+                const w = 16;
+                const h = 16;
+                const c = document.createElement('canvas');
+                c.width = w;
+                c.height = h;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const data = ctx.getImageData(0, 0, w, h).data;
+                let r = 0,
+                  g = 0,
+                  b = 0,
+                  count = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                  const alpha = data[i + 3];
+                  if (alpha === 0) continue;
+                  r += data[i];
+                  g += data[i + 1];
+                  b += data[i + 2];
+                  count++;
+                }
+                if (count === 0) return resolve('#1db954');
+                r = Math.round(r / count);
+                g = Math.round(g / count);
+                b = Math.round(b / count);
+                clearTimeout(timeout);
+                resolve(rgbToHex(r, g, b));
+              } catch (e) {
+                clearTimeout(timeout);
+                resolve('#1db954');
+              }
+            };
+            img.onerror = () => {
+              clearTimeout(timeout);
+              resolve('#1db954');
+            };
+          });
+        }
+
+        // Slightly brighten / saturate a hex color for a more "chillón" progress accent.
+        function brightenHex(hex, amt = 20) {
+          try {
+            const h = hex.replace('#', '');
+            const r = parseInt(h.substring(0, 2), 16);
+            const g = parseInt(h.substring(2, 4), 16);
+            const b = parseInt(h.substring(4, 6), 16);
+            const nr = Math.min(255, Math.round(r + (255 - r) * (amt / 100)));
+            const ng = Math.min(255, Math.round(g + (255 - g) * (amt / 100)));
+            const nb = Math.min(255, Math.round(b + (255 - b) * (amt / 100)));
+            return rgbToHex(nr, ng, nb);
+          } catch (e) {
+            return hex;
+          }
+        }
+
+        async function updateThemeForThumbnail(src) {
+          const meta = document.querySelector('meta[name="theme-color"]') || document.createElement('meta');
+          const col = await dominantColorFromImage(src).catch(() => '#1db954');
+          const accent = brightenHex(col, 34);
+          meta.name = 'theme-color';
+          meta.content = accent;
+          if (!document.contains(meta)) document.head.appendChild(meta);
+          // also update CSS variable used by the progress UI
+          document.documentElement.style.setProperty('--verde', accent);
+        }
+
+        function setupMediaSessionActions() {
+          if (!('mediaSession' in navigator)) return;
+          try {
+            navigator.mediaSession.setActionHandler('play', () => audio.play());
+            navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+            navigator.mediaSession.setActionHandler('previoustrack', () => prevBtn.click());
+            navigator.mediaSession.setActionHandler('nexttrack', () => nextBtn.click());
+            navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+              const skip = (details && details.seekOffset) || 10;
+              audio.currentTime = Math.max(0, audio.currentTime - skip);
+            });
+            navigator.mediaSession.setActionHandler('seekforward', (details) => {
+              const skip = (details && details.seekOffset) || 10;
+              audio.currentTime = Math.min(audio.duration || Infinity, audio.currentTime + skip);
+            });
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+              if (details.fastSeek && 'fastSeek' in audio) audio.fastSeek(details.seekTime);
+              else audio.currentTime = details.seekTime;
+            });
+          } catch (e) {
+            console.warn('mediaSession action handlers failed', e);
+          }
+        }
+
+        function updateMediaSessionMetadata(track) {
+          if (!('mediaSession' in navigator)) return;
+          try {
+            const title = track?.titulo || track?.ruta || 'Mini Spotify';
+            const artist = track?.artista || 'Mini Spotify';
+            const artwork = [];
+            if (track?.thumbnail) {
+              artwork.push({ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' });
+            }
+            navigator.mediaSession.metadata = new MediaMetadata({ title, artist, artwork });
+            navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
+            setupMediaSessionActions();
+          } catch (e) {
+            console.warn('updateMediaSessionMetadata failed', e);
+          }
+        }
         function format(sec) {
           if (!isFinite(sec) || sec <= 0) return "0:00";
           sec = Math.floor(sec);
@@ -392,6 +523,13 @@
           audio.src = src;
           audio.load();
           setUIForTrack(track);
+          // update Media Session metadata and theme color
+          try {
+            updateMediaSessionMetadata(track);
+            updateThemeForThumbnail(track.thumbnail);
+          } catch (e) {
+            console.warn('media session/theme update error', e);
+          }
 
           // HISTORIAL (solo en modo radio i.e. !isPlaylist) salvo que venga fromHistory = true
           if (!isPlaylist && !options.fromHistory) {
@@ -447,6 +585,17 @@
           tTotal.textContent = isFinite(d) && d > 0 ? format(d) : "0:00";
           progreso.value = 0;
           progreso.style.setProperty("--value", "0%");
+          if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration: isFinite(d) && d > 0 ? d : 0,
+                playbackRate: audio.playbackRate || 1,
+                position: audio.currentTime || 0,
+              });
+            } catch (e) {
+              // ignore if unsupported
+            }
+          }
           // notify parent about needed height (postMessage)
           requestParentResize();
         });
@@ -458,6 +607,15 @@
           const pct = (cur / audio.duration) * 100;
           progreso.style.setProperty("--value", pct + "%");
           tActual.textContent = format(cur);
+          if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration: isFinite(audio.duration) ? audio.duration : 0,
+                playbackRate: audio.playbackRate || 1,
+                position: audio.currentTime || 0,
+              });
+            } catch (e) {}
+          }
         });
 
         audio.addEventListener("ended", () => {
@@ -521,6 +679,10 @@
         });
         audio.addEventListener("play", () => (playPauseBtn.textContent = "⏸"));
         audio.addEventListener("pause", () => (playPauseBtn.textContent = "▶"));
+
+        // keep mediaSession playbackState in sync
+        audio.addEventListener('play', () => { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing'; });
+        audio.addEventListener('pause', () => { if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused'; });
 
         // Prev/Next: if no playlist, try to use local catalog as a temp playlist
         function ensurePlaylistFromCatalog() {
