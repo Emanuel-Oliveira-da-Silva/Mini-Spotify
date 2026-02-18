@@ -19,39 +19,43 @@
         color: #1db954;
       }
 
-      /* Contenedor título y opciones */
+      /* Contenedor título y opciones: mejor distribución */
       .header-playlist {
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: space-between;
         position: relative;
-        margin-top: 50px;
-        margin-bottom: 10px;
+        margin-top: 28px;
+        margin-bottom: 6px;
+        gap: 12px;
       }
 
-      /* Título centrado */
+      /* Título centrado y flexible */
       #tituloPlaylist {
         font-size: 28px;
         color: white;
         text-align: center;
+        flex: 1 1 auto;
+        margin: 0 12px;
       }
 
       /* Botón + Agregar canción */
       #btnAgregarCancion {
-        display: block;
-        margin: 10px auto;
-        padding: 10px 20px;
-        font-size: 16px;
+        display: inline-block;
+        padding: 10px 18px;
+        font-size: 15px;
         background-color: #1db954;
         color: black;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 800;
+        box-shadow: 0 8px 20px rgba(29,185,84,0.08);
       }
-      #btnAgregarCancion:hover {
-        transform: scale(1.05);
-      }
+      #btnAgregarCancion:hover { transform: translateY(-2px); }
+
+      /* Controls grouping (add + shuffle) */
+      .controls-bar { display:flex; gap:12px; align-items:center; }
 
       /* Mini menú para agregar canciones (ahora más grande y responsive) */
       #miniCanciones {
@@ -184,9 +188,9 @@
       #listaCanciones {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 18px;
+        gap: 18px 22px;
         align-items: start;
-        padding: 12px 8px;
+        padding: 18px 8px 28px 8px;
       }
 
       #listaCanciones .cancion {
@@ -202,11 +206,12 @@
       }
 
       #listaCanciones .cancion img {
-        width: 120px;
-        height: 120px;
-        border-radius: 8px;
+        width: 140px;
+        height: 140px;
+        border-radius: 10px;
         object-fit: cover;
         display: block;
+        box-shadow: 0 6px 26px rgba(0,0,0,0.45);
       }
 
       #listaCanciones .cancion p {
@@ -221,6 +226,22 @@
         animation: jiggle 0.14s infinite;
         cursor: grab;
         user-select: none;
+        touch-action: none; /* allow pointer dragging without browser gestures */
+      }
+      /* normal behavior: allow vertical scroll and default touch handling */
+      #listaCanciones .cancion { touch-action: pan-y; }
+      /* smooth movement animation for items when reordering */
+      #listaCanciones .cancion {
+        transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease, opacity 180ms ease;
+        will-change: transform;
+      }
+      .placeholder {
+        height: 140px; /* matches thumbnail height roughly */
+        border-radius: 10px;
+        background: rgba(255,255,255,0.02);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        margin: 8px;
+        transition: height 180ms ease, opacity 180ms ease;
       }
       .reorder-mode .cancion.dragging { opacity: 0.5; transform: scale(0.98); }
       @keyframes jiggle {
@@ -337,9 +358,13 @@
         color: white;
       }
 
-      /* Limita el backdrop y el menú al área de este documento (frame) */
+      /* Contenedor principal centrado y con ancho máximo para mejor lectura */
       #playlistContainer {
         position: relative;
+        max-width: 1180px;
+        margin: 8px auto 72px auto;
+        padding: 12px;
+        box-sizing: border-box;
       }
 
       /* shuffle circular */
@@ -376,19 +401,24 @@
 
     <div class="header-playlist">
       <h1 id="tituloPlaylist"></h1>
-      <button id="reorderDone">Listo</button>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button id="reorderDone">Listo</button>
+      </div>
       <div class="menu-opciones">
         ⋮
         <div class="miniMenuOpciones">
           <button id="renombrar">Renombrar Playlist</button>
           <button id="vaciar">Vaciar Playlist</button>
           <button id="borrar">Borrar Playlist</button>
+          <button id="btnReordenar" title="Reordenar">Reordenar</button>
         </div>
       </div>
     </div>
 
-    <button id="btnAgregarCancion">+ Agregar canción</button>
-    <button id="btnShuffle">🔀</button>
+    <div class="controls-bar">
+      <button id="btnAgregarCancion">+ Agregar canción</button>
+      <button id="btnShuffle">🔀</button>
+    </div>
 
     <div id="miniCanciones">
       <input
@@ -449,8 +479,8 @@
         // force reflow then pop
         void reorderDone.offsetWidth;
         reorderDone.classList.add('pop');
-        // make items draggable
-        listaEl.querySelectorAll('.cancion').forEach(n => n.draggable = true);
+        // make items draggable and disable native touch actions while reordering
+        listaEl.querySelectorAll('.cancion').forEach(n => { n.draggable = true; try { n.style.touchAction = 'none'; } catch(e){} });
       }
       async function disableReorderMode() {
         document.body.classList.remove('reorder-mode');
@@ -458,7 +488,7 @@
         // hide animated
         reorderDone.classList.remove('pop');
         reorderDone.classList.remove('show');
-        listaEl.querySelectorAll('.cancion').forEach(n => n.draggable = false);
+        listaEl.querySelectorAll('.cancion').forEach(n => { n.draggable = false; try { n.style.touchAction = ''; } catch(e){} });
         // persist order to server
         try {
           const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
@@ -478,6 +508,14 @@
         }
       }
       reorderDone.addEventListener('click', () => { disableReorderMode(); });
+      // visible toggle to enter reorder mode (useful on desktop)
+      const btnReordenar = document.getElementById('btnReordenar');
+      if (btnReordenar) {
+        btnReordenar.addEventListener('click', () => {
+          if (document.body.classList.contains('reorder-mode')) disableReorderMode();
+          else enableReorderMode();
+        });
+      }
 
       // Evitar el menú contextual del navegador mientras estemos en reorder-mode
       document.addEventListener('contextmenu', (e) => {
@@ -560,6 +598,8 @@
 
       // Render canciones
       function renderCanciones() {
+        // remove any leftover placeholders (from aborted drags) before rendering
+        Array.from(document.querySelectorAll('.placeholder')).forEach(n => n.remove());
         listaEl.innerHTML = "";
         if (!estado.canciones.length) {
           listaEl.innerHTML = "<p>No hay canciones en esta playlist.</p>";
@@ -638,56 +678,79 @@
           row.addEventListener('mouseleave', cancelLP);
           row.addEventListener('touchend', cancelLP);
 
-          // drag handlers for reordering (mouse)
-          row.addEventListener('dragstart', (ev) => { ev.dataTransfer.effectAllowed = 'move'; row.classList.add('dragging'); window._draggingEl = row; });
-          row.addEventListener('dragend', (ev) => { row.classList.remove('dragging'); if (window._draggingEl) window._draggingEl = null; });
-          row.addEventListener('dragover', (ev) => { ev.preventDefault(); const dragging = window._draggingEl; if (!dragging || dragging === row) return; const box = row.getBoundingClientRect(); const offset = ev.clientY - box.top; const after = offset > box.height/2; const parent = row.parentNode; if (after) parent.insertBefore(dragging, row.nextSibling); else parent.insertBefore(dragging, row); });
-          row.addEventListener('drop', (ev) => { ev.preventDefault(); // update estado.canciones order from DOM
-            const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
-            const newOrder = nodes.map(n => n.dataset.songId);
-            // reorder estado.canciones accordingly
-            estado.canciones = newOrder.map(id => estado.canciones.find(s => String(s.id) === String(id))).filter(Boolean);
-            toast('Reordenado (cambios locales)');
-          });
-
-          // touch handlers for mobile reordering (fallback to emulate drag)
-          let touchDragging = false;
-          row.addEventListener('touchstart', (ev) => {
+          // Pointer-based drag (works for mouse and touch) - smooth ghost + placeholder
+          row.addEventListener('pointerdown', (ev) => {
             if (!document.body.classList.contains('reorder-mode')) return;
-            if (ev.touches.length > 1) return;
-            ev.preventDefault(); // prevent long-press menu
-            touchDragging = true;
-            row.classList.add('dragging');
-            window._draggingEl = row;
-          }, { passive: false });
-
-          row.addEventListener('touchmove', (ev) => {
-            if (!touchDragging) return;
+            if (ev.button && ev.button !== 0) return; // only primary
             ev.preventDefault();
-            const t = ev.touches[0];
-            const el = document.elementFromPoint(t.clientX, t.clientY);
-            const candidate = el && el.closest('.cancion');
-            if (candidate && candidate !== row) {
-              const box = candidate.getBoundingClientRect();
-              const after = t.clientY - box.top > box.height / 2;
-              const parent = candidate.parentNode;
-              if (after) parent.insertBefore(row, candidate.nextSibling);
-              else parent.insertBefore(row, candidate);
-            }
-          }, { passive: false });
 
-          function finishTouchDrag() {
-            if (!touchDragging) return;
-            touchDragging = false;
-            row.classList.remove('dragging');
-            if (window._draggingEl) window._draggingEl = null;
-            // persist new local order
-            const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
-            estado.canciones = nodes.map(n => estado.canciones.find(s => String(s.id) === String(n.dataset.songId))).filter(Boolean);
-            toast('Reordenado (táctil)');
-          }
-          row.addEventListener('touchend', finishTouchDrag);
-          row.addEventListener('touchcancel', finishTouchDrag);
+            const orig = row;
+            const rect = orig.getBoundingClientRect();
+            const placeholder = document.createElement('div');
+            placeholder.className = 'placeholder';
+            placeholder.style.width = rect.width + 'px';
+            placeholder.style.height = rect.height + 'px';
+
+            // insert placeholder in place of original
+            orig.parentNode.insertBefore(placeholder, orig);
+            orig.style.visibility = 'hidden';
+
+            // try to capture pointer so we reliably get pointerup/pointercancel
+            try { if (orig.setPointerCapture) orig.setPointerCapture(ev.pointerId); } catch(e){}
+
+            // create ghost clone
+            const ghost = orig.cloneNode(true);
+            ghost.style.position = 'fixed';
+            ghost.style.left = rect.left + 'px';
+            ghost.style.top = rect.top + 'px';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = 20000;
+            ghost.style.boxShadow = '0 20px 40px rgba(0,0,0,0.45)';
+            ghost.style.transform = 'scale(1.04)';
+            document.body.appendChild(ghost);
+
+            const onMove = (mev) => {
+              const x = mev.clientX;
+              const y = mev.clientY;
+              ghost.style.left = x - rect.width / 2 + 'px';
+              ghost.style.top = y - rect.height / 2 + 'px';
+
+              // Adjust placeholder position dynamically
+              const over = document.elementFromPoint(x, y);
+              if (over && over !== placeholder && over.classList.contains('cancion')) {
+                const parent = over.parentNode;
+                if (parent) {
+                  const rectOver = over.getBoundingClientRect();
+                  const before = y < rectOver.top + rectOver.height / 2;
+                  parent.insertBefore(placeholder, before ? over : over.nextSibling);
+                }
+              }
+            };
+
+            const onUp = () => {
+              // Remove ghost and placeholder
+              ghost.remove();
+              placeholder.remove();
+              orig.style.visibility = '';
+
+              // Update song order
+              const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
+              estado.canciones = nodes.map((n) => estado.canciones.find((s) => String(s.id) === String(n.dataset.songId))).filter(Boolean);
+
+              // Persist order to server
+              api.reorderPl(pid, estado.canciones.map((c) => c.id));
+
+              // Cleanup event listeners
+              window.removeEventListener('pointermove', onMove);
+              window.removeEventListener('pointerup', onUp);
+              window.removeEventListener('pointercancel', onUp);
+            };
+
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+            window.addEventListener('pointercancel', onUp);
+          });
           listaEl.appendChild(row);
         });
       }
@@ -909,24 +972,41 @@
         wrapper.style.background = 'rgba(15,15,15,0.98)';
         wrapper.style.borderRadius = '12px';
         wrapper.style.boxShadow = '0 22px 50px rgba(0,0,0,0.65)';
-        wrapper.innerHTML = `<input type="text" id="__overlayBuscar" placeholder="Buscar canción..." style="width:100%;padding:14px 16px;border-radius:10px;border:none;font-size:18px;background:#0f0f0f;color:#fff;margin-bottom:16px;">`;
+        // Provide a search input and an empty results container for the parent overlay.
+        wrapper.innerHTML = `<input type="text" id="__overlayBuscar" placeholder="Buscar canción..." style="width:100%;padding:14px 16px;border-radius:10px;border:none;font-size:18px;background:#0f0f0f;color:#fff;margin-bottom:16px;">
+          <div id="__overlayResults"></div>`;
 
-        // render items from cancionesCatalogo (filtered by current query)
-        const q = (inputBuscarMini.value || '').toString().trim().toLowerCase();
-        const items = q === '' ? cancionesCatalogo.slice() : cancionesCatalogo.filter((c) => (c.titulo || '').toLowerCase().includes(q));
-        const grid = document.createElement('div');
-        grid.style.display = 'grid';
-        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
-        grid.style.gap = '22px 24px';
-        items.forEach(c => {
-          const html = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);">
-            <img src="${c.thumbnail}" alt="${(c.titulo||'').replace(/"/g,'') }" style="width:140px;height:140px;border-radius:10px;object-fit:cover;" />
-            <p style="color:#fff;text-align:center;margin:0">${(c.titulo||'').replace(/</g,'&lt;')}</p>
-            <button data-mini-action="add" data-ruta="${(c.ruta||'').replace(/"/g,'') }" data-titulo="${(c.titulo||'').replace(/"/g,'') }" style="margin-top:8px;padding:6px 10px;border-radius:6px;">Agregar</button>
-          </div>`;
-          const div = document.createElement('div'); div.innerHTML = html; grid.appendChild(div.firstElementChild);
-        });
-        wrapper.appendChild(grid);
+        // helper to build HTML grid for a query (used when parent asks for results)
+        const buildResultsHtml = (query) => {
+          const q = (query || '').toString().trim().toLowerCase();
+          const items = q === '' ? cancionesCatalogo.slice() : cancionesCatalogo.filter((c) => (c.titulo || '').toLowerCase().includes(q));
+          if (!items.length) return '<div style="color:#999;padding:18px">No se encontraron canciones.</div>';
+          const grid = document.createElement('div');
+          grid.style.display = 'grid';
+          grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+          grid.style.gap = '22px 24px';
+          items.forEach(c => {
+            const safeTitle = (c.titulo || '').replace(/</g,'&lt;').replace(/\"/g,'');
+            const safeRuta = (c.ruta || '').replace(/\"/g,'');
+            const thumb = c.thumbnail || '';
+            const html = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);">
+              <img src="${thumb}" alt="${safeTitle}" style="width:140px;height:140px;border-radius:10px;object-fit:cover;" />
+              <p style="color:#fff;text-align:center;margin:0">${safeTitle}</p>
+              <button data-mini-action="add" data-ruta="${safeRuta}" data-titulo="${safeTitle}" style="margin-top:8px;padding:6px 10px;border-radius:6px;">Agregar</button>
+            </div>`;
+            const div = document.createElement('div'); div.innerHTML = html; grid.appendChild(div.firstElementChild);
+          });
+          return grid.outerHTML;
+        };
+
+        // Listen for parent overlay search requests and reply with HTML results
+        const _overlayHandler = (ev) => {
+          const d = ev.data || {};
+          if (!d || d.type !== 'overlay-search') return;
+          // reply to parent with rendered HTML for results
+          try { ev.source.postMessage({ type: 'overlay-html', html: buildResultsHtml(d.query || '') }, '*'); } catch (err) { /* ignore */ }
+        };
+        window.addEventListener('message', _overlayHandler, { once: false });
 
         // send to parent
         try { parent.postMessage({ type: 'show-mini-menu', html: wrapper.outerHTML }, '*'); } catch (err) { console.warn('No parent to show overlay', err); }
@@ -976,6 +1056,16 @@
       function mostrarMiniCanciones(query = "") {
         const q = (query || "").toString().trim().toLowerCase();
         listaMini.innerHTML = "";
+
+        // Ensure cancionesCatalogo is defined and not empty
+        if (!Array.isArray(cancionesCatalogo) || cancionesCatalogo.length === 0) {
+          const noCatalog = document.createElement("div");
+          noCatalog.style.color = "#999";
+          noCatalog.style.padding = "18px";
+          noCatalog.textContent = "El catálogo de canciones no está disponible.";
+          listaMini.appendChild(noCatalog);
+          return;
+        }
 
         // Si la búsqueda está vacía, mostrar todo el catálogo
         const items = q === ""

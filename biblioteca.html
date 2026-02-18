@@ -38,12 +38,18 @@
         margin: 0;
       }
       li {
-        padding: 8px;
+        padding: 10px 12px;
         border-bottom: 1px solid #222;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-radius: 8px;
       }
       li:hover {
-        background: #111;
+        background: #0f0f0f;
+        transform: translateX(2px);
       }
       /* Prevent mobile text selection and touch-callout on playlist items */
       #listaPlaylists li {

@@ -82,15 +82,52 @@
       overlay.style.display = 'flex';
       overlay.style.pointerEvents = 'auto';
 
-      // wire up add buttons inside the overlay: send click back to contenidoFrame
-      overlay.querySelectorAll('[data-mini-action="add"]').forEach(el => {
-        el.addEventListener('click', () => {
-          const payload = { type: 'mini-menu-click', ruta: el.dataset.ruta, titulo: el.dataset.titulo };
-          try { window.frames['contenidoFrame'].postMessage(payload, '*'); } catch (err) { /* ignore */ }
+      // helper to wire add buttons (results inserted dynamically may need re-wiring)
+      const wireAddButtons = () => {
+        overlay.querySelectorAll('[data-mini-action="add"]').forEach(el => {
+          // remove existing handlers to avoid duplicates
+          el.replaceWith(el.cloneNode(true));
         });
-      });
+        overlay.querySelectorAll('[data-mini-action="add"]').forEach(el => {
+          el.addEventListener('click', () => {
+            const payload = { type: 'mini-menu-click', ruta: el.dataset.ruta, titulo: el.dataset.titulo };
+            try { window.frames['contenidoFrame'].postMessage(payload, '*'); } catch (err) { /* ignore */ }
+          });
+        });
+      };
 
-      backdrop.addEventListener('click', hideOverlay);
+      // wire initial buttons (if grid was included)
+      wireAddButtons();
+
+      // watch for input inside overlay and forward queries back to the source frame
+      const searchInput = overlay.querySelector('#__overlayBuscar');
+      if (searchInput) {
+        const src = ev.source;
+        searchInput.addEventListener('input', () => {
+          try { src.postMessage({ type: 'overlay-search', query: searchInput.value || '' }, '*'); } catch (err) { }
+        });
+        // request initial results
+        try { ev.source.postMessage({ type: 'overlay-search', query: '' }, '*'); } catch (err) {}
+      }
+
+      // listen for HTML results from the child frame and inject them into the overlay
+      const overlayReply = (msgEv) => {
+        const dd = msgEv.data || {};
+        if (!dd || dd.type !== 'overlay-html') return;
+        // put results into the results container if present, else replace overlay
+        const results = overlay.querySelector('#__overlayResults');
+        if (results) {
+          results.innerHTML = dd.html || '';
+        } else {
+          // fallback: replace overlay content
+          overlay.innerHTML = dd.html || '';
+        }
+        // re-wire add buttons inside the newly-inserted HTML
+        wireAddButtons();
+      };
+      window.addEventListener('message', overlayReply);
+
+      backdrop.addEventListener('click', () => { hideOverlay(); window.removeEventListener('message', overlayReply); });
     } else if (d.type === 'open-create-playlist') {
       // open create-playlist modal rendered by parent, with bubble animation from child button
       const btnRect = d.btnRect || { left: 0, top: 0, width: 0, height: 0 };

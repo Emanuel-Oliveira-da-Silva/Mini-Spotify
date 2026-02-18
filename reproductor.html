@@ -24,13 +24,22 @@
         gap: 12px;
         align-items: center;
         height: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.45));
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4);
+        position: relative;
+        transform: translateY(-6px);
       }
 
       /* Left: thumbnail */
       .thumb {
         width: 88px;
         height: 88px;
-        border-radius: 8px;
+        border-radius: 12px;
         background: linear-gradient(180deg, #222, #111);
         display: flex;
         align-items: center;
@@ -208,21 +217,35 @@
           gap: 8px;
         }
         .thumb {
-          width: 96px;
-          height: 96px;
+          width: 120px;
+          height: 120px;
         }
         .title .titulo {
           font-size: 15px;
         }
         /* bigger touch targets for controls on phones */
         .controls button {
-          font-size: 22px;
-          padding: 10px;
-          border-radius: 8px;
+          font-size: 26px;
+          padding: 12px;
+          border-radius: 12px;
         }
         /* easier to grab progress */
-        #progreso { height: 10px; }
-        #progreso::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -6px; }
+        #progreso { height: 12px; border-radius: 10px; }
+        #progreso::-webkit-slider-thumb { width: 24px; height: 24px; margin-top: -8px; }
+      }
+      @media (min-width:900px) {
+        .player-wrap { transform: translateY(-8px); }
+      }
+
+      /* Visual feedback when changing track */
+      .thumb.track-change { transition: transform 360ms cubic-bezier(.2,.9,.2,1), opacity 260ms ease; }
+      .thumb.track-change.next { transform: translateX(18px) scale(0.92); opacity: 0.4; }
+      .thumb.track-change.prev { transform: translateX(-18px) scale(0.92); opacity: 0.4; }
+      .title.track-fade { transition: opacity 360ms ease, transform 360ms cubic-bezier(.2,.9,.2,1); opacity: 0.5; transform: translateY(6px); }
+      @media (min-width: 900px) {
+        .thumb { width: 96px; height: 96px; }
+        .title .titulo { font-size: 15px; }
+        .controls button { font-size: 20px; }
       }
     </style>
   </head>
@@ -299,6 +322,21 @@
         const nextBtn = document.getElementById("nextBtn");
         const prevBtn = document.getElementById("prevBtn");
         const volumenControl = document.getElementById("volumenControl");
+
+        // track change animation helpers
+        function animateTrackChange(dir) {
+          try {
+            const th = document.getElementById('thumb');
+            const title = document.querySelector('.title');
+            if (!th) return;
+            th.classList.add('track-change', dir);
+            if (title) title.classList.add('track-fade');
+            setTimeout(() => {
+              th.classList.remove('track-change', dir);
+              if (title) title.classList.remove('track-fade');
+            }, 420);
+          } catch (e) { console.warn('anim track', e); }
+        }
 
         // === HISTORIAL para modo radio (contenido.html) ===
         let radioHistory = []; // guardará tracks (objetos) en orden de reproducción
@@ -756,10 +794,11 @@
         }
 
         nextBtn.addEventListener("click", () => {
-          // Si estamos en playlist, comportamiento normal:
+          // visual feedback
+          animateTrackChange('next');
           if (isPlaylist && currentPlaylist.length) {
             const n = currentPlaylist.length;
-            // Si hay shuffle activado por la playlist, usar el orden shuffle (envuelve)
+          animateTrackChange('prev');
             if (window._playlistShuffle) {
               currentIndex = siguienteIndexPlaylist();
             } else {
