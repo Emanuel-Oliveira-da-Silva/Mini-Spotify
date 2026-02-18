@@ -193,15 +193,21 @@
           gap: 8px;
         }
         .thumb {
-          width: 72px;
-          height: 72px;
+          width: 96px;
+          height: 96px;
         }
         .title .titulo {
-          font-size: 13px;
+          font-size: 15px;
         }
+        /* bigger touch targets for controls on phones */
         .controls button {
-          font-size: 18px;
+          font-size: 22px;
+          padding: 10px;
+          border-radius: 8px;
         }
+        /* easier to grab progress */
+        #progreso { height: 10px; }
+        #progreso::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -6px; }
       }
     </style>
   </head>

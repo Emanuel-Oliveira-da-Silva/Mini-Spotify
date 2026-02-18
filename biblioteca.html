@@ -66,6 +66,7 @@
         cursor: pointer;
         font-weight: bold;
       }
+      /* modal will be rendered by the parent (index.html) overlay */
     </style>
   </head>
   <body class="biblioteca">
@@ -73,14 +74,7 @@
 
     <button class="btn-playlist" id="nuevaPlaylistBtn">+ Nueva Playlist</button>
 
-    <div id="formNueva">
-      <input
-        type="text"
-        id="nombrePlaylist"
-        placeholder="Nombre de la playlist..."
-      />
-      <button id="crearPlaylistBtn">Crear</button>
-    </div>
+    <!-- Modal is rendered by the parent overlay -->
 
     <ul id="listaPlaylists"></ul>
 
@@ -89,10 +83,9 @@
 
     <script>
       const lista = document.getElementById("listaPlaylists");
-      const formNueva = document.getElementById("formNueva");
       const btnNueva = document.getElementById("nuevaPlaylistBtn");
-      const inputNombre = document.getElementById("nombrePlaylist");
-      const btnCrear = document.getElementById("crearPlaylistBtn");
+      // we'll receive create requests from parent overlay via postMessage
+      const btnCrear = null;
 
       (async function init() {
         const ok = await requireAuth();
@@ -124,24 +117,32 @@
         }
       }
 
-      // Mostrar/ocultar formulario
-      btnNueva.addEventListener("click", () => {
-        formNueva.style.display =
-          formNueva.style.display === "none" ? "block" : "none";
-        inputNombre.focus();
+      // When user clicks the button, request parent to open a global modal
+      btnNueva.addEventListener('click', () => {
+        const rect = btnNueva.getBoundingClientRect();
+        // send rect so parent can compute absolute position and animate bubble from the button
+        window.parent.postMessage({ type: 'open-create-playlist', btnRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height } }, '*');
       });
 
-      // Crear playlist
-      btnCrear.addEventListener("click", async () => {
-        const nombre = inputNombre.value.trim();
-        if (!nombre) return alert("Poné un nombre");
-        try {
-          await api.createPl(nombre);
-          inputNombre.value = "";
-          formNueva.style.display = "none";
-          await cargarPlaylists();
-        } catch (e) {
-          alert(e.error || "Error al crear playlist");
+      // Listen for create requests coming from parent overlay
+      window.addEventListener('message', async (ev) => {
+        const d = ev.data || {};
+        if (d.type === 'create-playlist') {
+          const nombre = (d.name || '').trim();
+          if (!nombre) {
+            // reply with error
+            ev.source.postMessage({ type: 'create-playlist-result', ok: false, error: 'Nombre vacío' }, '*');
+            return;
+          }
+          try {
+            const res = await api.createPl(nombre);
+            // notify parent of success
+            ev.source.postMessage({ type: 'create-playlist-result', ok: true, id: res.id }, '*');
+            // refresh local list
+            await cargarPlaylists();
+          } catch (e) {
+            ev.source.postMessage({ type: 'create-playlist-result', ok: false, error: e.error || String(e) }, '*');
+          }
         }
       });
     </script>

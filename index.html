@@ -55,7 +55,19 @@
   overlay.setAttribute('style', styleBase + 'z-index:10000;align-items:center;justify-content:center;overflow:auto;pointer-events:none;');
   document.documentElement.appendChild(overlay);
 
-  function hideOverlay(){ backdrop.style.display='none'; overlay.style.pointerEvents='none'; overlay.style.display='none'; overlay.innerHTML=''; backdrop.removeEventListener('click', hideOverlay); }
+  let _currentBubble = null;
+  let _pendingCreateFrom = null;
+
+  function hideOverlay(){
+    backdrop.style.display='none';
+    overlay.style.pointerEvents='none';
+    overlay.style.display='none';
+    overlay.innerHTML='';
+    backdrop.removeEventListener('click', hideOverlay);
+    // remove bubble if any
+    try { if (_currentBubble) { _currentBubble.remove(); _currentBubble = null; } } catch(e){}
+    _pendingCreateFrom = null;
+  }
 
   // close when clicking outside the menu wrapper (on the overlay background)
   overlay.addEventListener('click', function(ev){ if (ev.target === overlay) hideOverlay(); });
@@ -79,8 +91,113 @@
       });
 
       backdrop.addEventListener('click', hideOverlay);
+    } else if (d.type === 'open-create-playlist') {
+      // open create-playlist modal rendered by parent, with bubble animation from child button
+      const btnRect = d.btnRect || { left: 0, top: 0, width: 0, height: 0 };
+      // find the frame element corresponding to the source window
+      const frames = Array.from(document.getElementsByTagName('frame'));
+      const srcWin = ev.source;
+      let frameEl = null;
+      for (const f of frames) {
+        try { if (f.contentWindow === srcWin) { frameEl = f; break; } } catch(e){}
+      }
+
+      // compute absolute coords
+      let absX = window.innerWidth/2, absY = window.innerHeight/2;
+      if (frameEl) {
+        const fr = frameEl.getBoundingClientRect();
+        absX = fr.left + btnRect.left + (btnRect.width||0)/2;
+        absY = fr.top + btnRect.top + (btnRect.height||0)/2;
+      }
+
+      // create bubble
+      const bubble = document.createElement('div');
+      _currentBubble = bubble;
+      Object.assign(bubble.style, {
+        position: 'fixed', left: absX + 'px', top: absY + 'px', width: '24px', height: '24px',
+        borderRadius: '50%', pointerEvents: 'none', zIndex: 9995,
+        transform: 'translate(-50%,-50%) scale(0)', transition: 'all 420ms cubic-bezier(.2,.9,.2,1), opacity 280ms ease',
+        background: 'radial-gradient(circle at 30% 30%, rgba(29,185,84,0.98), rgba(20,140,60,0.95))', boxShadow: '0 10px 40px rgba(0,0,0,0.45)'
+      });
+      document.documentElement.appendChild(bubble);
+
+      // expand to center and large size
+      const maxDim = Math.max(window.innerWidth, window.innerHeight) * 2;
+      requestAnimationFrame(() => {
+        bubble.style.left = (window.innerWidth/2) + 'px';
+        bubble.style.top = (window.innerHeight/2) + 'px';
+        bubble.style.width = maxDim + 'px';
+        bubble.style.height = maxDim + 'px';
+        bubble.style.transform = 'translate(-50%,-50%) scale(1)';
+      });
+
+      const doneShow = () => {
+        // render modal HTML inside overlay (include simple styles)
+        overlay.innerHTML = `
+          <style>
+            .gp-modal { width:100%; max-width:720px; background:linear-gradient(180deg,#0f0f0f,#121212); border-radius:14px; padding:20px; color:#fff; box-shadow:0 18px 40px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.04); text-align:center; }
+            .gp-modal h3{ margin:0 0 8px 0; }
+            .gp-modal .sub{ color:#bdbdbd; margin-bottom:12px; }
+            .gp-input{ width:100%; padding:12px 14px; border-radius:10px; background:#151515; color:#fff; border:1px solid rgba(255,255,255,0.06); margin-bottom:12px; }
+            .gp-actions{ display:flex; gap:10px; justify-content:center; }
+            .gp-primary{ background:linear-gradient(180deg,#1db954,#15a84a); color:black; font-weight:700; border:none; padding:10px 16px; border-radius:10px; cursor:pointer; }
+            .gp-secondary{ background:transparent; color:#ddd; border:1px solid rgba(255,255,255,0.06); padding:10px 16px; border-radius:10px; cursor:pointer; }
+            @media(max-width:420px){ .gp-modal{ max-width:92%; padding:16px; border-radius:12px; } }
+          </style>
+          <div class="gp-modal" role="dialog" aria-modal="true">
+            <h3>Crear nueva playlist</h3>
+            <div class="sub">Elegí un nombre para tu playlist</div>
+            <input id="global_nombrePlaylist" class="gp-input" placeholder="Nombre de la playlist..." />
+            <div class="gp-actions"><button id="global_create_btn" class="gp-primary">Crear</button><button id="global_cancel_btn" class="gp-secondary">Cancelar</button></div>
+          </div>`;
+
+        backdrop.style.display = 'block';
+        overlay.style.display = 'flex';
+        overlay.style.pointerEvents = 'auto';
+        backdrop.addEventListener('click', hideOverlay);
+
+        // fade bubble out a bit
+        bubble.style.opacity = '0.95';
+
+        // wire buttons
+        const createBtn = overlay.querySelector('#global_create_btn');
+        const cancelBtn = overlay.querySelector('#global_cancel_btn');
+        const input = overlay.querySelector('#global_nombrePlaylist');
+        input.focus();
+
+        _pendingCreateFrom = srcWin;
+
+        createBtn.addEventListener('click', () => {
+          const name = (input.value || '').trim();
+          if (!name) return alert('Poné un nombre');
+          try { srcWin.postMessage({ type: 'create-playlist', name }, '*'); } catch (err) { alert('No se puede crear (error interno)'); }
+        });
+        cancelBtn.addEventListener('click', hideOverlay);
+      };
+
+      bubble.addEventListener('transitionend', function onend(ev2){
+        if (ev2.propertyName === 'width' || ev2.propertyName === 'transform') {
+          bubble.removeEventListener('transitionend', onend);
+          // small delay for smoothness
+          setTimeout(doneShow, 80);
+        }
+      });
+
+      // safety fallback
+      setTimeout(doneShow, 520);
     } else if (d.type === 'hide-mini-menu') {
       hideOverlay();
+    } else if (d.type === 'create-playlist-result') {
+      // child reports result of playlist creation
+      // only react if it matches the pending frame
+      if (!_pendingCreateFrom || ev.source !== _pendingCreateFrom) return;
+      if (d.ok) {
+        // close overlay and optionally show a brief success (could be improved)
+        hideOverlay();
+        try { alert('Playlist creada correctamente'); } catch(e){}
+      } else {
+        alert('Error: ' + (d.error || 'No se pudo crear la playlist'));
+      }
     }
   }, false);
 })();
