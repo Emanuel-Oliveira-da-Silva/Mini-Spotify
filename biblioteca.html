@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
     <title>Biblioteca</title>
     <style>
@@ -81,7 +82,34 @@
         cursor: pointer;
         font-weight: bold;
       }
+      @media (max-width: 600px) {
+        /* Make controls and list items bigger on phones */
+        .btn-playlist {
+          padding: 14px;
+          font-size: 18px;
+          border-radius: 10px;
+        }
+        li {
+          padding: 14px 16px;
+          font-size: 16px;
+          gap: 12px;
+        }
+        h2 { font-size: 20px; }
+      }
       /* modal will be rendered by the parent (index.html) overlay */
+
+      @media (max-width: 600px) {
+  li {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .btn-playlist {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
+
     </style>
   </head>
   <body class="biblioteca">

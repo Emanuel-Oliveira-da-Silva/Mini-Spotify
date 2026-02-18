@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
     <title>Resultados</title>
     <style>
@@ -70,6 +71,54 @@
         display: inline-block;
         margin: 10px;
       }
+      /* Default card sizes (desktop baseline) */
+      .cancion img {
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+        object-fit: cover;
+        display: block;
+      }
+      .cancion p { margin: 6px 0 0; font-size: 14px; color: #fff; text-align: center; }
+      
+      /* ===== GRID MOBILE PRO ===== */
+/* ===== GRID MOBILE PRO ===== */
+@media (max-width: 600px) {
+  #resultados {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  #resultados .cancion-wrapper,
+  #resultados .cancion {
+    width: 100%;
+  }
+
+  #resultados .cancion-wrapper {
+    display: block;
+    margin: 0;
+  }
+
+  .cancion img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .cancion p {
+    font-size: 12px;
+  }
+
+  .btn-agregar {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+      
     </style>
   </head>
   <body class="main">

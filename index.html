@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/174/174872.png">
   <title>Mini Spotify</title>
   <script src="api.js"></script>
@@ -22,17 +23,22 @@
   // este listener recibe el mensaje de reproductor.html y ajusta rows del frameset
   window.addEventListener('message', (e) => {
     if (!e.data || !e.data.setPlayerHeight) return;
-    const h = Number(e.data.setPlayerHeight) || 120;
-    try {
-      const fs = document.getElementsByTagName('frameset')[0];
-      if (!fs) return;
-      // ajusta la última fila a px (10%,*,<px>)
-      // conservá las dos primeras como estaban (siempre: 10% y *), pero reemplaza la última
-      // si querés otra lógica, la adaptamos
-      fs.rows = `10%,*,${Math.max(100, h)}px`;
-    } catch (err) {
-      console.warn('No se pudo ajustar frameset rows', err);
-    }
+    const raw = e.data.setPlayerHeight;
+const h = parseInt(raw, 10);
+
+if (isNaN(h)) return; // 👈 CLAVE: no forzar 120
+
+try {
+  const fs = document.getElementsByTagName('frameset')[0];
+  if (!fs) return;
+
+  const safeHeight = Math.max(72, Math.min(h, 140)); // 👈 límite superior
+  fs.rows = `10%,*,${safeHeight}px`;
+
+} catch (err) {
+  console.warn('No se pudo ajustar frameset rows', err);
+}
+
   }, false);
 </script>
 
@@ -293,12 +299,12 @@
   }, false);
 })();
 </script>
-<frameset rows="10%,*,80px" border="0" onload="boot()">
+<frameset rows="10%,*,1200px" border="0" onload="boot()">
   <!-- Barra superior -->
   <frame src="barra.html" name="barraFrame" scrolling="no" noresize>
 
   <!-- Centro: Biblioteca + Contenido -->
-  <frameset cols="20%,*" border="0">
+  <frameset cols="160px,*" border="0">
     <frame src="biblioteca.html" name="bibliotecaFrame" scrolling="auto">
     <frame src="contenido.html"  name="contenidoFrame"  scrolling="auto">
   </frameset>

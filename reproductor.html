@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reproductor</title>
   <meta name="theme-color" content="#1db954">
     <style>
@@ -12,55 +13,67 @@
         --text: #fff;
       }
       html,
-      body {
-        margin: 0;
-        padding: 10px;
-        background: var(--bg);
-        color: var(--text);
-        font-family: Arial, sans-serif;
-      }
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;              /* 🔥 importante */
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
       .player-wrap {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        height: 100%;
-        max-width: 1180px;
-        margin: 0 auto;
-        box-sizing: border-box;
-        padding: 8px 12px;
-        background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.45));
-        border-radius: 14px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4);
-        position: relative;
-        transform: translateY(-6px);
-      }
+  display: flex;
+  gap: 10px;
+  align-items: center;   /* 🔥 no stretch */
+  min-height: auto;      /* 🔥 quitar 100vh */
+  height: auto;          /* 🔥 importante */
+    /* 🔥 en vez de height:100% */
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, rgba(20,20,20,0.6), rgba(10,10,10,0.45));
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.4);
+  position: relative;
+  flex-wrap: nowrap;
+}
+
 
       /* Left: thumbnail */
       .thumb {
-        width: 88px;
-        height: 88px;
-        border-radius: 12px;
-        background: linear-gradient(180deg, #222, #111);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
+  width: clamp(48px, 8vw, 64px);
+  height: clamp(48px, 8vw, 64px);
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #222, #111);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+
+
       .thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 
       /* Right: info + barra + controles */
       .right {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-      }
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
 
       /* Título arriba */
       .title {
@@ -86,14 +99,15 @@
         text-overflow: ellipsis;
       }
       .title .titulo {
-        font-weight: 700;
-        font-size: 14px;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
+  font-weight: 700;
+  font-size: clamp(12px, 2.8vw, 14px);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
       .title .subtitulo {
         font-size: 12px;
         color: #dcdcdc;
@@ -109,21 +123,24 @@
         padding: 6px 8px;
       }
       .time {
-        font-size: 12px;
-        width: 44px;
-        text-align: center;
-        color: #fff;
-        opacity: 0.9;
-      }
+  font-size: clamp(10px, 2.5vw, 12px);
+  width: clamp(28px, 6vw, 44px);
+  text-align: center;
+  color: #fff;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
       #progreso {
-        flex: 1;
-        appearance: none;
-        height: 8px;
-        border-radius: 8px;
-        background: #444;
-        outline: none;
-        min-width: 140px;
-      }
+  flex: 1;
+  appearance: none;
+  height: 8px;
+  border-radius: 8px;
+  background: #444;
+  outline: none;
+  min-width: 60px; /* 🔥 antes 140px */
+}
+
       #progreso::-webkit-slider-runnable-track {
         height: 8px;
         border-radius: 8px;
@@ -169,14 +186,17 @@
         padding-top: 6px;
       }
       .controls button {
-        background: none;
-        border: none;
-        color: var(--text);
-        font-size: 20px;
-        cursor: pointer;
-        padding: 6px;
-        border-radius: 6px;
-      }
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+
       .controls button:hover {
         color: var(--verde);
         transform: scale(1.08);
@@ -211,42 +231,51 @@
         opacity: 0.9;
       }
 
-      /* Make sure everything is vertically aligned in small heights */
-      @media (max-width: 420px) {
-        .player-wrap {
-          gap: 8px;
-        }
-        .thumb {
-          width: 120px;
-          height: 120px;
-        }
-        .title .titulo {
-          font-size: 15px;
-        }
-        /* bigger touch targets for controls on phones */
-        .controls button {
-          font-size: 26px;
-          padding: 12px;
-          border-radius: 12px;
-        }
-        /* easier to grab progress */
-        #progreso { height: 12px; border-radius: 10px; }
-        #progreso::-webkit-slider-thumb { width: 24px; height: 24px; margin-top: -8px; }
-      }
-      @media (min-width:900px) {
-        .player-wrap { transform: translateY(-8px); }
-      }
 
-      /* Visual feedback when changing track */
-      .thumb.track-change { transition: transform 360ms cubic-bezier(.2,.9,.2,1), opacity 260ms ease; }
-      .thumb.track-change.next { transform: translateX(18px) scale(0.92); opacity: 0.4; }
-      .thumb.track-change.prev { transform: translateX(-18px) scale(0.92); opacity: 0.4; }
-      .title.track-fade { transition: opacity 360ms ease, transform 360ms cubic-bezier(.2,.9,.2,1); opacity: 0.5; transform: translateY(6px); }
-      @media (min-width: 900px) {
-        .thumb { width: 96px; height: 96px; }
-        .title .titulo { font-size: 15px; }
-        .controls button { font-size: 20px; }
-      }
+  .controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .center {
+    width: 100%;
+  }
+
+
+  /* ===== MOBILE TIGHT MODE ===== */
+@media (max-width: 480px) {
+  .player-wrap {
+    gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .controls {
+    gap: 12px;
+  }
+
+  #progreso {
+    min-width: 40px;
+  }
+}
+
+/* ===== ULTRA SMALL ===== */
+@media (max-width: 360px) {
+  .center {
+    gap: 4px;
+    padding: 4px 6px;
+  }
+
+  .controls {
+    gap: 10px;
+  }
+
+  .time {
+    width: 28px;
+    font-size: 10px;
+  }
+}
+
+
     </style>
   </head>
   <body>

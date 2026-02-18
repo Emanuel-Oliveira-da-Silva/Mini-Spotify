@@ -2,6 +2,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
     <title>Contenido</title>
     <style>
@@ -52,6 +53,15 @@
         display: inline-block;
         margin: 10px;
       }
+      /* Default artwork/card sizes */
+      .cancion img {
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+        object-fit: cover;
+        display: block;
+      }
+      .cancion p { margin: 6px 0 0; font-size: 14px; color: #fff; text-align: center; }
 
       #notificacion {
         position: fixed;
@@ -73,6 +83,60 @@
         gap: 20px;
         padding: 10px 0;
       }
+      
+      @media (max-width: 600px) {
+  .seccion-canciones,
+  .seccion-lista {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .cancion {
+    width: 100%;
+    height: auto;
+  }
+
+  .cancion img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+    /* ===== GRID MOBILE PRO ===== */
+@media (max-width: 600px) {
+  .seccion-canciones,
+  .seccion-lista {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 👈 3 columnas */
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .cancion-wrapper,
+  .cancion {
+    width: 100%;
+  }
+
+  .cancion img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1; /* 👈 cuadrados perfectos */
+  }
+
+  .cancion p {
+    font-size: 12px; /* 👈 más compacto */
+  }
+
+  .btn-agregar {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+
     </style>
   </head>
   <body class="main">
