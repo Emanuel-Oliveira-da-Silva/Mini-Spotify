@@ -198,3 +198,87 @@ audio::-webkit-media-controls-time-remaining-display {
   border-radius: 50%;
   cursor: pointer;
 }
+
+/* ==========================
+   Mobile / Responsive tweaks
+   ========================== */
+
+/* Base adjustments for small devices */
+@media (max-width: 768px) {
+  /* Slightly larger base font for readability */
+  html, body { font-size: 16px; }
+
+  /* Make touch targets bigger and easier to press */
+  button, .btn, input[type="button"], input[type="submit"], .btn-agregar {
+    padding: 10px 14px;
+    font-size: 16px;
+    min-height: 44px; /* recommended touch target */
+    border-radius: 12px;
+  }
+
+  /* Inputs and search boxes more tappable */
+  input, textarea, select {
+    font-size: 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  /* Playlist song cards: more flexible on small screens */
+  .cancion {
+    width: 140px; /* responsive fixed-ish size */
+    height: auto;
+    padding: 10px 6px;
+  }
+
+  .cancion img {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 8px;
+  }
+
+  /* Sections that previously scrolled horizontally should wrap on small screens */
+  .seccion-canciones {
+    flex-wrap: wrap;
+    gap: 12px;
+    overflow-x: visible;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Progress bar larger and easier to drag */
+  #progreso { height: 8px; }
+  #progreso::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -6px; }
+}
+
+/* Extra small devices (phones) */
+@media (max-width: 420px) {
+  html, body { font-size: 15px; }
+
+  /* Make headers scale down but remain readable */
+  h1 { font-size: 20px; }
+  h2, h3 { font-size: 18px; }
+
+  /* Make buttons even larger for thumbs */
+  button, .btn, .btn-agregar {
+    padding: 12px 16px;
+    font-size: 18px;
+    min-height: 48px;
+  }
+
+  /* Ensure playlist left column (if present) doesn't consume too much vertical space */
+  ul li { font-size: 16px; padding: 12px; }
+
+  /* Reduce margins and increase spacing so elements don't feel cramped */
+  .cancion { width: 120px; }
+  .cancion img { width: 100px; height: 100px; }
+
+  /* Increase scrollbar hit area on mobile-like narrow windows */
+  ::-webkit-scrollbar { height: 12px; }
+
+  /* Make the global page layout adapt better (where frames are used) */
+  .barra { gap: 8px; }
+}
+
+/* Helpful utility: make any small icons/buttons easier to tap when inside cards */
+.cancion button, .cancion .btn-agregar { min-width: 40px; min-height: 40px; }
+

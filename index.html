@@ -38,6 +38,53 @@
 
 
 <!-- OJO: en documentos con frames, no se usa <body>; va <frameset> -->
+<!-- Global overlay/backdrop (created by script below) -->
+<script>
+// Crea un backdrop y un contenedor de overlay en el documento padre
+(function(){
+  function qs(id){return document.getElementById(id);} 
+  const styleBase = 'position:fixed;inset:0;display:none;';
+  const backdrop = document.createElement('div');
+  backdrop.id = 'globalBackdrop';
+  backdrop.setAttribute('style', styleBase + 'background:rgba(0,0,0,0.45);z-index:9990;');
+  document.documentElement.appendChild(backdrop);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'globalOverlay';
+  // start hidden (display:none). When showing, we'll set display:flex so centering works.
+  overlay.setAttribute('style', styleBase + 'z-index:10000;align-items:center;justify-content:center;overflow:auto;pointer-events:none;');
+  document.documentElement.appendChild(overlay);
+
+  function hideOverlay(){ backdrop.style.display='none'; overlay.style.pointerEvents='none'; overlay.style.display='none'; overlay.innerHTML=''; backdrop.removeEventListener('click', hideOverlay); }
+
+  // close when clicking outside the menu wrapper (on the overlay background)
+  overlay.addEventListener('click', function(ev){ if (ev.target === overlay) hideOverlay(); });
+
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if (d.type === 'show-mini-menu') {
+      // d.html should contain the menu markup; parent will render it
+      overlay.innerHTML = d.html || '';
+      backdrop.style.display = 'block';
+      // make overlay visible and center its contents
+      overlay.style.display = 'flex';
+      overlay.style.pointerEvents = 'auto';
+
+      // wire up add buttons inside the overlay: send click back to contenidoFrame
+      overlay.querySelectorAll('[data-mini-action="add"]').forEach(el => {
+        el.addEventListener('click', () => {
+          const payload = { type: 'mini-menu-click', ruta: el.dataset.ruta, titulo: el.dataset.titulo };
+          try { window.frames['contenidoFrame'].postMessage(payload, '*'); } catch (err) { /* ignore */ }
+        });
+      });
+
+      backdrop.addEventListener('click', hideOverlay);
+    } else if (d.type === 'hide-mini-menu') {
+      hideOverlay();
+    }
+  }, false);
+})();
+</script>
 <frameset rows="10%,*,80px" border="0" onload="boot()">
   <!-- Barra superior -->
   <frame src="barra.html" name="barraFrame" scrolling="no" noresize>

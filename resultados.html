@@ -78,6 +78,7 @@
     <div id="resultados"></div>
 
     <script src="canciones.js"></script>
+    <script src="api.js"></script>
     <script>
       document.getElementById("btn-volver").addEventListener("click", () => {
         window.location.href = "contenido.html";
@@ -110,28 +111,20 @@
             const mini = document.createElement("div");
             mini.classList.add("miniPlaylists");
 
-            const playlists =
-              JSON.parse(localStorage.getItem("playlists")) || [];
-            playlists.forEach((pl) => {
-              const btnPl = document.createElement("button");
-              btnPl.textContent = pl.nombre;
-              btnPl.addEventListener("click", () => {
-                const index = playlists.findIndex(
-                  (x) => x.nombre === pl.nombre
-                );
-                if (
-                  !playlists[index].canciones.some((x) => x.ruta === c.ruta)
-                ) {
-                  playlists[index].canciones.push(c);
-                  localStorage.setItem("playlists", JSON.stringify(playlists));
+            btnAgregar.addEventListener("click", async (e) => {
+              mini.innerHTML = "";
+              const res = await api.playlists();
+              (res.playlists || []).forEach((pl) => {
+                const btnPl = document.createElement("button");
+                btnPl.textContent = pl.nombre;
+                btnPl.addEventListener("click", async () => {
+                  await api.addSong(pl.id, c);
                   alert(`Se agregó "${c.titulo}" a "${pl.nombre}"`);
-                }
-                mini.style.display = "none";
+                  mini.style.display = "none";
+                });
+                mini.appendChild(btnPl);
               });
-              mini.appendChild(btnPl);
-            });
 
-            btnAgregar.addEventListener("click", (e) => {
               mini.style.display =
                 mini.style.display === "flex" ? "none" : "flex";
               mini.style.top = e.target.offsetTop + 30 + "px";

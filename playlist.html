@@ -53,34 +53,79 @@
         transform: scale(1.05);
       }
 
-      /* Mini menú para agregar canciones */
+      /* Mini menú para agregar canciones (ahora más grande y responsive) */
       #miniCanciones {
         display: none;
         position: absolute;
-        top: 100px;
+        top: 80px;
         left: 50%;
         transform: translateX(-50%);
-        max-height: 420px;
-        overflow-y: auto;
-        background-color: #0f0f0f;
-        border-radius: 8px;
-        padding: 10px;
-        z-index: 100;
-        flex-direction: column;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        width: 92%;
+        max-width: 1280px;
+        height: 78%;
+        overflow: auto;
+        background-color: rgba(15, 15, 15, 0.98);
+        border-radius: 14px;
+        padding: 22px;
+        z-index: 1400;
+        /* layout when open will be block; keep CSS default hidden */
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.65);
       }
 
-      /* Lista de canciones en mini menú */
+      /* Lista de canciones en mini menú: grid con thumbnails grandes */
+      #listaMiniCanciones {
+        margin-top: 12px;
+        overflow-y: auto;
+        padding-right: 8px;
+        display: grid;
+        grid-auto-rows: minmax(180px, auto);
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 22px 24px; /* row-gap col-gap */
+        align-items: start;
+        justify-items: center;
+      }
+
       #listaMiniCanciones .cancion {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        margin-bottom: 8px;
-        cursor: pointer;
+        justify-content: flex-start;
         gap: 10px;
+        margin: 0;
+        padding: 12px 8px;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
       }
+
+      #listaMiniCanciones .cancion:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      }
+
       #listaMiniCanciones .cancion img {
-        width: 50px;
-        height: 50px;
+        width: 140px;
+        height: 140px;
+        border-radius: 10px;
+        object-fit: cover;
+        display: block;
+      }
+
+      #listaMiniCanciones .cancion p {
+        margin: 0;
+        font-size: 15px;
+        text-align: center;
+        color: white;
+      }
+
+      /* Backdrop that dims the page when menu is open */
+      #menuBackdrop {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 1300;
       }
 
       /* Opciones playlist (3 puntos) */
@@ -135,33 +180,118 @@
       }
 
       /* Lista de canciones de la playlist */
+      /* Lista de canciones de la playlist (grid responsive de columnas) */
+      #listaCanciones {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 18px;
+        align-items: start;
+        padding: 12px 8px;
+      }
+
       #listaCanciones .cancion {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        margin: 10px;
+        justify-content: flex-start;
+        gap: 8px;
+        margin: 0;
+        padding: 8px;
         cursor: pointer;
-        gap: 10px;
         position: relative;
       }
+
       #listaCanciones .cancion img {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        object-fit: cover;
+        display: block;
+      }
+
+      #listaCanciones .cancion p {
+        margin: 0;
+        font-size: 13px;
+        text-align: center;
+        color: white;
+      }
+
+      /* botón eliminar: siempre blanco y visible sobre la miniatura */
+      #listaCanciones .cancion > button {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: white;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
       }
 
       /* Input mini menú */
       #buscarCancionMini {
         width: 100%;
-        padding: 8px;
-        margin-bottom: 10px;
-        border-radius: 6px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        border-radius: 10px;
         border: none;
-        font-size: 14px;
-        background: #1a1a1a;
+        font-size: 18px;
+        background: #0f0f0f;
         color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      }
+
+      /* Responsive: mobile adjustments */
+      @media (max-width: 600px) {
+        #miniCanciones {
+          width: 96%;
+          max-width: 96%;
+          top: 70px;
+          padding: 12px;
+          max-height: 70vh;
+        }
+        #listaMiniCanciones {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 10px;
+        }
+        #listaMiniCanciones .cancion img {
+          width: 88px;
+          height: 88px;
+        }
+        #listaMiniCanciones .cancion p {
+          font-size: 13px;
+        }
+        #buscarCancionMini { font-size: 14px; padding: 10px; }
+      }
+
+      @media (min-width: 900px) {
+        /* Desktop: más impacto visual */
+        #miniCanciones {
+          padding: 22px;
+          max-height: 82vh;
+        }
+        #listaMiniCanciones {
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 18px;
+        }
+        #listaMiniCanciones .cancion img { width: 140px; height: 140px; }
+        #listaMiniCanciones .cancion p { font-size: 16px; }
       }
 
       div {
         color: white;
+      }
+
+      /* Limita el backdrop y el menú al área de este documento (frame) */
+      #playlistContainer {
+        position: relative;
       }
 
       /* shuffle circular */
@@ -193,6 +323,7 @@
     </style>
   </head>
   <body class="main">
+    <div id="playlistContainer">
     <div class="volver" id="btn-volver">←</div>
 
     <div class="header-playlist">
@@ -219,9 +350,12 @@
       <div id="listaMiniCanciones"></div>
     </div>
 
+    <div id="menuBackdrop" aria-hidden="true"></div>
+
     <div id="listaCanciones"></div>
 
     <div id="notificacion"></div>
+    </div>
 
     <!-- Catálogo local para agregar canciones (tu fuente local) -->
     <script src="canciones.js"></script>
@@ -580,10 +714,89 @@
       const listaMini = document.getElementById("listaMiniCanciones");
       const inputBuscarMini = document.getElementById("buscarCancionMini");
 
-      btnAgregar.addEventListener("click", () => {
-        miniCanciones.style.display =
-          miniCanciones.style.display === "block" ? "none" : "block";
-        mostrarMiniCanciones();
+      let _miniOpen = false;
+      let _escHandler = null;
+      const menuBackdrop = document.getElementById('menuBackdrop');
+
+      function openMini() {
+        // show (request parent to render global overlay)
+        _miniOpen = true;
+        inputBuscarMini.value = "";
+        mostrarMiniCanciones("");
+        inputBuscarMini.focus();
+        listaMini.scrollTop = 0;
+
+        // build HTML for parent overlay using current listaMini content
+        const wrapper = document.createElement('div');
+        wrapper.style.boxSizing = 'border-box';
+        wrapper.style.width = '50%';
+        wrapper.style.minWidth = '360px';
+        wrapper.style.maxWidth = '1280px';
+        wrapper.style.maxHeight = '80vh';
+        wrapper.style.overflow = 'auto';
+        wrapper.style.padding = '22px';
+        wrapper.style.margin = '0 auto';
+        wrapper.style.background = 'rgba(15,15,15,0.98)';
+        wrapper.style.borderRadius = '12px';
+        wrapper.style.boxShadow = '0 22px 50px rgba(0,0,0,0.65)';
+        wrapper.innerHTML = `<input type="text" id="__overlayBuscar" placeholder="Buscar canción..." style="width:100%;padding:14px 16px;border-radius:10px;border:none;font-size:18px;background:#0f0f0f;color:#fff;margin-bottom:16px;">`;
+
+        // render items from cancionesCatalogo (filtered by current query)
+        const q = (inputBuscarMini.value || '').toString().trim().toLowerCase();
+        const items = q === '' ? cancionesCatalogo.slice() : cancionesCatalogo.filter((c) => (c.titulo || '').toLowerCase().includes(q));
+        const grid = document.createElement('div');
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+        grid.style.gap = '22px 24px';
+        items.forEach(c => {
+          const html = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);">
+            <img src="${c.thumbnail}" alt="${(c.titulo||'').replace(/"/g,'') }" style="width:140px;height:140px;border-radius:10px;object-fit:cover;" />
+            <p style="color:#fff;text-align:center;margin:0">${(c.titulo||'').replace(/</g,'&lt;')}</p>
+            <button data-mini-action="add" data-ruta="${(c.ruta||'').replace(/"/g,'') }" data-titulo="${(c.titulo||'').replace(/"/g,'') }" style="margin-top:8px;padding:6px 10px;border-radius:6px;">Agregar</button>
+          </div>`;
+          const div = document.createElement('div'); div.innerHTML = html; grid.appendChild(div.firstElementChild);
+        });
+        wrapper.appendChild(grid);
+
+        // send to parent
+        try { parent.postMessage({ type: 'show-mini-menu', html: wrapper.outerHTML }, '*'); } catch (err) { console.warn('No parent to show overlay', err); }
+
+        // ESC key (use window listener to close via parent)
+        _escHandler = (ev) => { if (ev.key === 'Escape' || ev.key === 'Esc') closeMini(); };
+        window.addEventListener('keydown', _escHandler, { capture: true });
+      }
+
+      function closeMini() {
+        // request parent to hide overlay
+        try { parent.postMessage({ type: 'hide-mini-menu' }, '*'); } catch (err) { /* ignore */ }
+        _miniOpen = false;
+        if (_escHandler) { window.removeEventListener('keydown', _escHandler, { capture: true }); _escHandler = null; }
+      }
+
+      btnAgregar.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        if (!_miniOpen) openMini(); else closeMini();
+      });
+
+      // Listen for clicks from parent overlay (when user clicks "Agregar")
+      window.addEventListener('message', async (ev) => {
+        const d = ev.data || {};
+        if (d && d.type === 'mini-menu-click') {
+          // find item in catalog by ruta or titulo
+          const item = cancionesCatalogo.find(x => (x.ruta || '') === (d.ruta || '') || (x.titulo || '') === (d.titulo || ''));
+          if (!item) return toast('Elemento no encontrado');
+          try {
+            const ya = estado.canciones.some((x) => (x.ruta||'') === (item.ruta||'') && (x.titulo||'') === (item.titulo||''));
+            if (ya) { toast('Ya estaba en la playlist'); return; }
+            await api.addSong(pid, { titulo: item.titulo, artista: item.artista||'', ruta: item.ruta||'', thumbnail: item.thumbnail||'', duration: item.duration||null });
+            await cargar();
+            toast('Canción agregada');
+            // ask parent to hide overlay
+            try { parent.postMessage({ type: 'hide-mini-menu' }, '*'); } catch (err) {}
+          } catch (err) {
+            alert(err?.error || 'Error al agregar canción');
+          }
+        }
       });
 
       inputBuscarMini.addEventListener("input", () => {
@@ -591,44 +804,55 @@
       });
 
       function mostrarMiniCanciones(query = "") {
+        const q = (query || "").toString().trim().toLowerCase();
         listaMini.innerHTML = "";
-        cancionesCatalogo
-          .filter((c) =>
-            (c.titulo || "").toLowerCase().includes((query || "").toLowerCase())
-          )
-          .forEach((c) => {
-            const div = document.createElement("div");
-            div.classList.add("cancion");
-            div.innerHTML = `<img src="${c.thumbnail}" alt="${c.titulo}"><p>${c.titulo}</p>`;
-            div.addEventListener("click", async () => {
-              try {
-                // Evitar duplicados por título+ruta
-                const ya = estado.canciones.some(
-                  (x) =>
-                    (x.ruta || "") === (c.ruta || "") &&
-                    (x.titulo || "") === (c.titulo || "")
-                );
-                if (ya) return toast("Ya estaba en la playlist");
 
-                await api.addSong(pid, {
-                  titulo: c.titulo,
-                  artista: c.artista || "",
-                  ruta: c.ruta || "",
-                  thumbnail: c.thumbnail || "",
-                  duration: c.duration || null,
-                });
-                await cargar();
-                toast(`Se agregó "${c.titulo}"`);
-                if (parent?.frames?.bibliotecaFrame) {
-                  parent.frames["bibliotecaFrame"].location.href =
-                    "biblioteca.html?refresh=" + Date.now();
-                }
-              } catch (e) {
-                alert(e?.error || "Error al agregar canción");
+        // Si la búsqueda está vacía, mostrar todo el catálogo
+        const items = q === ""
+          ? cancionesCatalogo.slice() // copia del array
+          : cancionesCatalogo.filter((c) => (c.titulo || "").toLowerCase().includes(q));
+
+        // Si no hubo resultados, mostrar mensaje
+        if (!items.length) {
+          const no = document.createElement("div");
+          no.style.color = "#999";
+          no.style.padding = "18px";
+          no.textContent = "No se encontraron canciones.";
+          listaMini.appendChild(no);
+          return;
+        }
+
+        items.forEach((c) => {
+          const div = document.createElement("div");
+          div.classList.add("cancion");
+          div.innerHTML = `<img src="${c.thumbnail}" alt="${c.titulo}"><p>${c.titulo}</p>`;
+          div.addEventListener("click", async () => {
+            try {
+              // Evitar duplicados por título+ruta
+              const ya = estado.canciones.some(
+                (x) => (x.ruta || "") === (c.ruta || "") && (x.titulo || "") === (c.titulo || "")
+              );
+              if (ya) return toast("Ya estaba en la playlist");
+
+              await api.addSong(pid, {
+                titulo: c.titulo,
+                artista: c.artista || "",
+                ruta: c.ruta || "",
+                thumbnail: c.thumbnail || "",
+                duration: c.duration || null,
+              });
+              await cargar();
+              toast(`Se agregó "${c.titulo}"`);
+              if (parent?.frames?.bibliotecaFrame) {
+                parent.frames["bibliotecaFrame"].location.href =
+                  "biblioteca.html?refresh=" + Date.now();
               }
-            });
-            listaMini.appendChild(div);
+            } catch (e) {
+              alert(e?.error || "Error al agregar canción");
+            }
           });
+          listaMini.appendChild(div);
+        });
       }
     </script>
   </body>
