@@ -131,7 +131,6 @@ ul li:hover {
 /* Estilo para el track (opcional, espacio detrás del deslizador) */
 ::-webkit-scrollbar-track {
   background-color: rgb(15, 15, 15); /* Color del fondo del track */
-  border-radius: 8px; /* Bordes redondeados */
 }
 
 /* Estilo para el fondo del reproductor */

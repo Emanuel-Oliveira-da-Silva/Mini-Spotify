@@ -110,9 +110,30 @@
   }
 }
 
+.volver {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+}
+
+.volver:hover {
+  color: #1db954;
+}
+
+body.biblioteca {
+  position: relative;
+  padding-top: 40px;
+}
+
+
     </style>
   </head>
   <body class="biblioteca">
+    <div class="volver" id="btnVolver">←</div>
+
     <h2>Mi Biblioteca</h2>
 
     <button class="btn-playlist" id="nuevaPlaylistBtn">+ Nueva Playlist</button>
@@ -233,6 +254,12 @@
           }
         }
       });
+
+      document.getElementById("btnVolver").addEventListener("click", () => {
+  window.parent.frames["contenidoFrame"].location.href = "contenido.html";
+});
+
+
     </script>
   </body>
 </html>

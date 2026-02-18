@@ -26,7 +26,7 @@
 
       .miniPlaylists {
         position: absolute;
-        background-color: #2a2a2a;
+        background-color: #2a2a2a00;
         border-radius: 8px;
         padding: 5px;
         display: none;
@@ -137,9 +137,98 @@
 }
 
 
+/* ===== QUICK PLAYLISTS — estilo biblioteca ===== */
+
+.qp-card {
+  height: auto;
+  border-radius: 8px;
+  background: #0f0f0f;
+  border: 1px solid #222;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all .15s ease;
+}
+
+.qp-card:hover {
+  background: #0f0f0f;
+  transform: translateX(2px);
+}
+
+.qp-title {
+  color: #fff;
+  font-weight: normal;
+}
+
+/* botón verde EXACTO de biblioteca */
+
+.qp-create {
+  background-color: #1db954;
+  color: black;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.qp-title {
+    background-color: transparent;
+}
+
+.qp-create .qp-title {
+  color: black;
+  font-weight: bold;
+  width: 100%;          /* 👈 clave */
+  text-align: center;   /* 👈 centra de verdad */
+}
+
+/* ===== GRID QUICK PLAYLISTS ===== */
+
+#qpGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+  grid-template-rows: repeat(3, auto);   /* hasta 3 filas */
+  gap: 10px;
+}
+
+/* header quick playlists */
+
+.qp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#verMasPlaylists {
+  color: #1db954;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+#quickPlaylists {
+  margin-bottom: 20px;
+}
+
+
     </style>
   </head>
   <body class="main">
+
+    <!-- ===== Playlists rápidas ===== -->
+    <section id="quickPlaylists">
+      <div class="qp-header">
+        <h2>Tus playlists</h2>
+        <span id="verMasPlaylists">Ver más</span>
+      </div>
+
+      <div id="qpGrid"></div>
+    </section>
+
+
     <h1>Explorar canciones</h1>
 
     <div id="contenedor-secciones"></div>
@@ -236,6 +325,104 @@
         );
         crearSeccion(seccion, canciones);
       });
+
+      // Quick Playlists
+      const qpGrid = document.getElementById("qpGrid");
+      // 🔥 guardar últimas visitadas
+function getUltimasVisitadas() {
+  try {
+    return JSON.parse(localStorage.getItem("qp_recent") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function registrarVisitaPlaylist(id) {
+  let arr = getUltimasVisitadas();
+
+  arr = arr.filter(x => x !== id);
+  arr.unshift(id);
+  arr = arr.slice(0, 5);
+
+  localStorage.setItem("qp_recent", JSON.stringify(arr));
+}
+
+// 🔥 QUICK PLAYLISTS REAL
+async function cargarQuickPlaylists() {
+  const grid = document.getElementById("qpGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  // ✅ CARD 1 — CREAR PLAYLIST (MISMO SISTEMA QUE BIBLIOTECA)
+  const crearCard = document.createElement("div");
+  crearCard.className = "qp-card qp-create";
+  crearCard.innerHTML = `<div class="qp-title">+ Nueva Playlist</div>`;
+
+  crearCard.addEventListener("click", () => {
+    const rect = crearCard.getBoundingClientRect();
+
+    window.parent.postMessage(
+      {
+        type: "open-create-playlist",
+        btnRect: {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height,
+        },
+      },
+      "*"
+    );
+  });
+
+  grid.appendChild(crearCard);
+
+  // ✅ cargar playlists
+  try {
+    const r = await api.playlists();
+    const todas = r.playlists || [];
+
+    const recientes = getUltimasVisitadas();
+
+    // ordenar: primero las visitadas recientemente
+    const ordenadas = [
+      ...recientes
+        .map(id => todas.find(p => p.id === id))
+        .filter(Boolean),
+      ...todas.filter(p => !recientes.includes(p.id)),
+    ].slice(0, 5);
+
+    ordenadas.forEach((pl) => {
+      const card = document.createElement("div");
+      card.className = "qp-card";
+      card.innerHTML = `<div class="qp-title">${pl.nombre}</div>`;
+
+      card.addEventListener("click", () => {
+        registrarVisitaPlaylist(pl.id);
+
+        window.parent.frames["contenidoFrame"].location.href =
+          `playlist.html?id=${pl.id}`;
+      });
+
+      grid.appendChild(card);
+    });
+  } catch (e) {
+    console.error(e);
+    grid.innerHTML =
+      `<div style="color:red;">Error al cargar playlists</div>`;
+  }
+}
+
+      
+      document.getElementById("verMasPlaylists").addEventListener("click", () => {
+        window.parent.frames[
+          "contenidoFrame"
+        ].location.href = "biblioteca.html";
+      });
+
+        cargarQuickPlaylists();
+
     </script>
   </body>
 </html>
