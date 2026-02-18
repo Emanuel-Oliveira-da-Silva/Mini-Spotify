@@ -479,6 +479,13 @@
       }
       reorderDone.addEventListener('click', () => { disableReorderMode(); });
 
+      // Evitar el menú contextual del navegador mientras estemos en reorder-mode
+      document.addEventListener('contextmenu', (e) => {
+        if (document.body.classList.contains('reorder-mode')) {
+          e.preventDefault();
+        }
+      });
+
       // Devuelve el índice de la próxima canción sin alterar la actual
       function actualizarProximaCancion() {
         const n = estado.canciones.length;
@@ -631,7 +638,7 @@
           row.addEventListener('mouseleave', cancelLP);
           row.addEventListener('touchend', cancelLP);
 
-          // drag handlers for reordering
+          // drag handlers for reordering (mouse)
           row.addEventListener('dragstart', (ev) => { ev.dataTransfer.effectAllowed = 'move'; row.classList.add('dragging'); window._draggingEl = row; });
           row.addEventListener('dragend', (ev) => { row.classList.remove('dragging'); if (window._draggingEl) window._draggingEl = null; });
           row.addEventListener('dragover', (ev) => { ev.preventDefault(); const dragging = window._draggingEl; if (!dragging || dragging === row) return; const box = row.getBoundingClientRect(); const offset = ev.clientY - box.top; const after = offset > box.height/2; const parent = row.parentNode; if (after) parent.insertBefore(dragging, row.nextSibling); else parent.insertBefore(dragging, row); });
@@ -642,6 +649,45 @@
             estado.canciones = newOrder.map(id => estado.canciones.find(s => String(s.id) === String(id))).filter(Boolean);
             toast('Reordenado (cambios locales)');
           });
+
+          // touch handlers for mobile reordering (fallback to emulate drag)
+          let touchDragging = false;
+          row.addEventListener('touchstart', (ev) => {
+            if (!document.body.classList.contains('reorder-mode')) return;
+            if (ev.touches.length > 1) return;
+            ev.preventDefault(); // prevent long-press menu
+            touchDragging = true;
+            row.classList.add('dragging');
+            window._draggingEl = row;
+          }, { passive: false });
+
+          row.addEventListener('touchmove', (ev) => {
+            if (!touchDragging) return;
+            ev.preventDefault();
+            const t = ev.touches[0];
+            const el = document.elementFromPoint(t.clientX, t.clientY);
+            const candidate = el && el.closest('.cancion');
+            if (candidate && candidate !== row) {
+              const box = candidate.getBoundingClientRect();
+              const after = t.clientY - box.top > box.height / 2;
+              const parent = candidate.parentNode;
+              if (after) parent.insertBefore(row, candidate.nextSibling);
+              else parent.insertBefore(row, candidate);
+            }
+          }, { passive: false });
+
+          function finishTouchDrag() {
+            if (!touchDragging) return;
+            touchDragging = false;
+            row.classList.remove('dragging');
+            if (window._draggingEl) window._draggingEl = null;
+            // persist new local order
+            const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
+            estado.canciones = nodes.map(n => estado.canciones.find(s => String(s.id) === String(n.dataset.songId))).filter(Boolean);
+            toast('Reordenado (táctil)');
+          }
+          row.addEventListener('touchend', finishTouchDrag);
+          row.addEventListener('touchcancel', finishTouchDrag);
           listaEl.appendChild(row);
         });
       }
