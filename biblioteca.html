@@ -104,10 +104,20 @@
           r.playlists.forEach((pl) => {
             const li = document.createElement("li");
             li.textContent = pl.nombre;
+            li.dataset.plId = pl.id;
+            li.dataset.plName = pl.nombre || '';
             li.addEventListener("click", () => {
               window.parent.frames[
                 "contenidoFrame"
               ].location.href = `playlist.html?id=${pl.id}`;
+            });
+            li.addEventListener('contextmenu', (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              // send request to parent to open context menu at mouse position
+              try {
+                window.parent.postMessage({ type: 'open-playlist-context', id: pl.id, name: pl.nombre || '', x: ev.clientX, y: ev.clientY }, '*');
+              } catch (e) {}
             });
             lista.appendChild(li);
           });
@@ -142,6 +152,34 @@
             await cargarPlaylists();
           } catch (e) {
             ev.source.postMessage({ type: 'create-playlist-result', ok: false, error: e.error || String(e) }, '*');
+          }
+        }
+        // actions from parent context menu
+        if (d.type === 'playlist-action') {
+          const id = d.id;
+          const action = d.action;
+          if (!id || !action) return;
+          try {
+            if (action === 'rename') {
+              const nuevo = prompt('Nuevo nombre para la playlist', d.name || '');
+              if (!nuevo) return ev.source.postMessage({ type: 'playlist-action-result', ok: false, error: 'Nombre vacío' }, '*');
+              await api.renamePl(id, nuevo);
+              await cargarPlaylists();
+              ev.source.postMessage({ type: 'playlist-action-result', ok: true });
+            } else if (action === 'empty') {
+              if (!confirm('Vaciar la playlist? Esta acción no se puede deshacer.')) return;
+              await api.clearPl(id);
+              await cargarPlaylists();
+              ev.source.postMessage({ type: 'playlist-action-result', ok: true });
+            } else if (action === 'delete') {
+              if (!confirm('Eliminar la playlist? Esta acción no se puede deshacer.')) return;
+              await api.delPl(id);
+              await cargarPlaylists();
+              ev.source.postMessage({ type: 'playlist-action-result', ok: true });
+            }
+          } catch (err) {
+            console.error(err);
+            ev.source.postMessage({ type: 'playlist-action-result', ok: false, error: err?.error || String(err) }, '*');
           }
         }
       });

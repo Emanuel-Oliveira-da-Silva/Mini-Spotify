@@ -62,6 +62,20 @@
         padding: 2px 6px;
         min-height: 32px;
       }
+      .playlist-badge {
+        display: inline-block;
+        margin-top: 6px;
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .title .titulo {
         font-weight: 700;
         font-size: 14px;
@@ -226,6 +240,7 @@
             No se está reproduciendo ninguna canción
           </div>
           <div class="subtitulo" id="subtitulo">-</div>
+          <div class="playlist-badge" id="playlistBadge" aria-hidden="true">Radio Mode📻</div>
         </div>
 
         <div class="center">
@@ -294,6 +309,7 @@
         let currentPlaylist = [];
         let currentIndex = 0;
         let isPlaylist = false;
+        let playlistName = "";
         let wrap = false;
         let nextIndex = 0;    // índice de la siguiente canción
         let _shuffle = false; // shuffle ON/OFF
@@ -354,6 +370,19 @@
           thumbImg.src =
             track?.thumbnail ||
             'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88"><rect fill="%231a1a1a" width="100%" height="100%"/></svg>';
+        }
+
+        function updatePlaylistBadge() {
+          const el = document.getElementById('playlistBadge');
+          if (!el) return;
+          if (isPlaylist) {
+            el.textContent = playlistName || 'Playlist';
+            el.style.display = 'inline-block';
+          } else {
+            // when not a playlist, show Radio Mode label
+            el.textContent = 'Radio Mode📻';
+            el.style.display = 'inline-block';
+          }
         }
 
         // --- Media Session & theme helpers ---
@@ -474,11 +503,13 @@
           try {
             const title = track?.titulo || track?.ruta || 'Mini Spotify';
             const artist = track?.artista || 'Mini Spotify';
+            // Use album field for playlist name / radio mode label
+            const album = isPlaylist ? (playlistName || 'Playlist') : 'Radio Mode📻';
             const artwork = [];
             if (track?.thumbnail) {
               artwork.push({ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' });
             }
-            navigator.mediaSession.metadata = new MediaMetadata({ title, artist, artwork });
+            navigator.mediaSession.metadata = new MediaMetadata({ title, artist, album, artwork });
             navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
             setupMediaSessionActions();
           } catch (e) {
@@ -523,10 +554,11 @@
           audio.src = src;
           audio.load();
           setUIForTrack(track);
-          // update Media Session metadata and theme color
+          // update Media Session metadata, theme color and UI badge
           try {
             updateMediaSessionMetadata(track);
             updateThemeForThumbnail(track.thumbnail);
+            updatePlaylistBadge();
           } catch (e) {
             console.warn('media session/theme update error', e);
           }
@@ -573,6 +605,11 @@
             Math.min(index, currentPlaylist.length - 1)
           );
           isPlaylist = true;
+          // ensure playlistName is set (if the incoming playlist didn't provide a name)
+          if (!playlistName) {
+            playlistName = (currentPlaylist && currentPlaylist.name) || (currentPlaylist && currentPlaylist.playlistName) || (currentPlaylist && currentPlaylist.length && currentPlaylist[0].seccion) || 'Playlist';
+          }
+          updatePlaylistBadge();
           playTrack(currentPlaylist[currentIndex]);
           // calcular próxima canción según estado shuffle/orden enviado
           actualizarProximaCancion();
@@ -708,6 +745,9 @@
               currentIndex = idx >= 0 ? idx : 0;
             }
             isPlaylist = true;
+            // since we created a playlist from the local catalog, set a helpful name
+            playlistName = 'Library';
+            updatePlaylistBadge();
             console.info(
               "Usando catalogo local como playlist temporal, len=",
               currentPlaylist.length
@@ -849,6 +889,7 @@
             }
 
             isPlaylist = false;
+            playlistName = "";
             currentPlaylist = [];
             currentIndex = 0;
 
@@ -869,6 +910,8 @@
 
             // Actualizar la playlist interna (no tocaremos currentIndex a menos que realmente haya que reproducir otra canción)
             currentPlaylist = data.playlist;
+            // store optional playlist name
+            playlistName = typeof data.name === 'string' ? data.name : (data.playlistName || '');
 
             // Guardar estado shuffle
             isPlaylist = true;
@@ -922,7 +965,21 @@
         });
 
         // expose for debugging
-        window._debugPlayer = { playTrack, currentPlaylist };
+        window._debugPlayer = {
+          playTrack,
+          currentPlaylist,
+          // color / theme helpers
+          dominantColorFromImage,
+          updateThemeForThumbnail,
+          brightenHex,
+          // media session helpers
+          updateMediaSessionMetadata,
+          getMediaSession: () => ('mediaSession' in navigator ? navigator.mediaSession : null),
+          // state dump
+          dumpState: () => ({ currentIndex, isPlaylist, playlistName, currentPlaylist, radioHistory, radioIndex, nextIndex }),
+          // allow forcing playlist name for testing
+          setPlaylistName: (name) => { playlistName = String(name || ''); updatePlaylistBadge(); updateMediaSessionMetadata({ titulo: tituloEl.textContent, artista: subt.textContent, thumbnail: thumbImg.src }); },
+        };
       })();
     </script>
   </body>

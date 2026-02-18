@@ -216,8 +216,45 @@
         color: white;
       }
 
-      /* botón eliminar: siempre blanco y visible sobre la miniatura */
-      #listaCanciones .cancion > button {
+      /* Reorder / jiggle mode */
+      .reorder-mode .cancion {
+        animation: jiggle 0.14s infinite;
+        cursor: grab;
+        user-select: none;
+      }
+      .reorder-mode .cancion.dragging { opacity: 0.5; transform: scale(0.98); }
+      @keyframes jiggle {
+        0% { transform: rotate(-1.5deg); }
+        50% { transform: rotate(1.5deg); }
+        100% { transform: rotate(-1.5deg); }
+      }
+
+      /* Done button for reorder mode (above title) */
+      #reorderDone {
+        position: absolute; top: -58px; left: 50%; transform: translateX(-50%) scale(0.86); z-index: 1200; display:none;
+        background: #1db954; color:black; padding:12px 18px; border-radius:14px; border:none; cursor:pointer; font-weight:800;
+        font-size: 16px; box-shadow: 0 12px 30px rgba(29,185,84,0.18), 0 6px 14px rgba(0,0,0,0.35);
+        transition: transform 360ms cubic-bezier(.2,.9,.2,1), opacity 260ms ease;
+        opacity: 0;
+      }
+      #reorderDone.show {
+        display: inline-block;
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+      }
+      #reorderDone.pop {
+        animation: popIn 420ms cubic-bezier(.2,.9,.2,1);
+      }
+      @keyframes popIn {
+        0% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+        60% { transform: translateX(-50%) scale(1.06); opacity: 1; }
+        100% { transform: translateX(-50%) scale(1); opacity: 1; }
+      }
+
+      /* botón eliminar: solo visible en reorder mode */
+      /* Target any button inside .cancion (not only direct child) so
+        buttons nested in wrappers remain hidden until reorder-mode */
+      #listaCanciones .cancion button {
         position: absolute;
         top: 6px;
         left: 6px;
@@ -233,6 +270,17 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        opacity: 0;
+        transform: scale(0.7);
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      /* show remove buttons only when in reorder-mode */
+      .reorder-mode #listaCanciones .cancion button {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
       }
 
       /* Input mini menú */
@@ -328,6 +376,7 @@
 
     <div class="header-playlist">
       <h1 id="tituloPlaylist"></h1>
+      <button id="reorderDone">Listo</button>
       <div class="menu-opciones">
         ⋮
         <div class="miniMenuOpciones">
@@ -389,6 +438,47 @@
         setTimeout(() => (noti.style.opacity = "0"), 1800);
       }
 
+      // Reorder mode controls
+      const reorderDone = document.getElementById('reorderDone');
+      function enableReorderMode() {
+        document.body.classList.add('reorder-mode');
+        listaEl.classList.add('reorder-mode');
+        // show button with animation
+        reorderDone.classList.remove('pop');
+        reorderDone.classList.add('show');
+        // force reflow then pop
+        void reorderDone.offsetWidth;
+        reorderDone.classList.add('pop');
+        // make items draggable
+        listaEl.querySelectorAll('.cancion').forEach(n => n.draggable = true);
+      }
+      async function disableReorderMode() {
+        document.body.classList.remove('reorder-mode');
+        listaEl.classList.remove('reorder-mode');
+        // hide animated
+        reorderDone.classList.remove('pop');
+        reorderDone.classList.remove('show');
+        listaEl.querySelectorAll('.cancion').forEach(n => n.draggable = false);
+        // persist order to server
+        try {
+          const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
+          const newOrder = nodes.map(n => Number(n.dataset.songId));
+          // call API to persist
+          const res = await api.reorderPl(pid, newOrder);
+          if (res && res.ok) {
+            toast('Orden guardado en el servidor');
+            // reload to sync orden and show updated order
+            await cargar();
+          } else {
+            toast('No se pudo guardar el orden en el servidor');
+          }
+        } catch (err) {
+          console.error('persist reorder', err);
+          toast('Error al guardar el orden');
+        }
+      }
+      reorderDone.addEventListener('click', () => { disableReorderMode(); });
+
       // Devuelve el índice de la próxima canción sin alterar la actual
       function actualizarProximaCancion() {
         const n = estado.canciones.length;
@@ -435,6 +525,8 @@
     index: currentIndex,
     shuffle: estado.shuffle,
     ordenShuffle: estado.ordenShuffle
+    ,
+    name: estado.playlist?.nombre || ''
   };
 
   if (parent?.frames?.reproductorFrame) {
@@ -469,6 +561,8 @@
         estado.canciones.forEach((c, i) => {
           const row = document.createElement("div");
           row.className = "cancion";
+            row.draggable = false;
+            row.dataset.songId = c.id;
 
           const img = document.createElement("img");
           img.alt = c.titulo || "canción";
@@ -517,7 +611,37 @@
 
           row.appendChild(contImg);
           row.appendChild(title);
-          row.addEventListener("click", () => reproducir(i));
+          // click to play (disabled while in reorder mode)
+          row.addEventListener("click", () => { if (!document.body.classList.contains('reorder-mode')) reproducir(i); });
+
+          // long-press to enable reorder/jiggle mode
+          let lpTimer = null;
+          const startLP = (ev) => {
+            if (document.body.classList.contains('reorder-mode')) return;
+            lpTimer = setTimeout(() => {
+              enableReorderMode();
+              // make the element draggable after entering mode
+              row.draggable = true;
+            }, 480);
+          };
+          const cancelLP = () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
+          row.addEventListener('mousedown', startLP);
+          row.addEventListener('touchstart', startLP);
+          row.addEventListener('mouseup', cancelLP);
+          row.addEventListener('mouseleave', cancelLP);
+          row.addEventListener('touchend', cancelLP);
+
+          // drag handlers for reordering
+          row.addEventListener('dragstart', (ev) => { ev.dataTransfer.effectAllowed = 'move'; row.classList.add('dragging'); window._draggingEl = row; });
+          row.addEventListener('dragend', (ev) => { row.classList.remove('dragging'); if (window._draggingEl) window._draggingEl = null; });
+          row.addEventListener('dragover', (ev) => { ev.preventDefault(); const dragging = window._draggingEl; if (!dragging || dragging === row) return; const box = row.getBoundingClientRect(); const offset = ev.clientY - box.top; const after = offset > box.height/2; const parent = row.parentNode; if (after) parent.insertBefore(dragging, row.nextSibling); else parent.insertBefore(dragging, row); });
+          row.addEventListener('drop', (ev) => { ev.preventDefault(); // update estado.canciones order from DOM
+            const nodes = Array.from(listaEl.querySelectorAll('.cancion'));
+            const newOrder = nodes.map(n => n.dataset.songId);
+            // reorder estado.canciones accordingly
+            estado.canciones = newOrder.map(id => estado.canciones.find(s => String(s.id) === String(id))).filter(Boolean);
+            toast('Reordenado (cambios locales)');
+          });
           listaEl.appendChild(row);
         });
       }

@@ -187,6 +187,60 @@
       setTimeout(doneShow, 520);
     } else if (d.type === 'hide-mini-menu') {
       hideOverlay();
+    } else if (d.type === 'open-playlist-context') {
+      // d: { id, name, x, y }
+      const btnRect = { left: d.x || 0, top: d.y || 0, width: 0, height: 0 };
+      const frames = Array.from(document.getElementsByTagName('frame'));
+      const srcWin = ev.source;
+      let frameEl = null;
+      for (const f of frames) {
+        try { if (f.contentWindow === srcWin) { frameEl = f; break; } } catch(e){}
+      }
+      let absX = window.innerWidth/2, absY = window.innerHeight/2;
+      if (frameEl) {
+        const fr = frameEl.getBoundingClientRect();
+        absX = fr.left + (d.x || 0);
+        absY = fr.top + (d.y || 0);
+      }
+      // render a small context menu at absX, absY inside overlay
+      overlay.innerHTML = '';
+      const menu = document.createElement('div');
+      menu.style.position = 'fixed';
+      menu.style.left = absX + 'px';
+      menu.style.top = absY + 'px';
+      menu.style.transform = 'translate(-6px,-6px)';
+      menu.style.background = '#1b1b1b';
+      menu.style.border = '1px solid rgba(255,255,255,0.04)';
+      menu.style.color = '#fff';
+      menu.style.borderRadius = '8px';
+      menu.style.padding = '6px';
+      menu.style.boxShadow = '0 12px 30px rgba(0,0,0,0.6)';
+      menu.style.zIndex = 10001;
+      menu.innerHTML = `
+        <div style="display:flex;flex-direction:column;min-width:160px;">
+          <button data-action="rename" style="padding:8px;border:none;background:transparent;color:#fff;text-align:left;cursor:pointer;">Renombrar</button>
+          <button data-action="empty" style="padding:8px;border:none;background:transparent;color:#fff;text-align:left;cursor:pointer;">Vaciar</button>
+          <button data-action="delete" style="padding:8px;border:none;background:transparent;color:#ff5b5b;text-align:left;cursor:pointer;">Eliminar</button>
+        </div>`;
+      overlay.appendChild(menu);
+      backdrop.style.display = 'block';
+      overlay.style.display = 'block';
+      overlay.style.pointerEvents = 'auto';
+
+      // wire actions
+      menu.querySelectorAll('button').forEach(bt => {
+        bt.addEventListener('click', (evb) => {
+          const action = bt.dataset.action || bt.getAttribute('data-action');
+          // send action back to source frame
+          try {
+            srcWin.postMessage({ type: 'playlist-action', action, id: d.id, name: d.name || '' }, '*');
+          } catch(e){}
+          // close overlay
+          backdrop.style.display = 'none'; overlay.style.display = 'none'; overlay.style.pointerEvents = 'none'; overlay.innerHTML = '';
+        });
+      });
+      // clicking outside will close
+      backdrop.addEventListener('click', () => { backdrop.style.display = 'none'; overlay.style.display = 'none'; overlay.style.pointerEvents = 'none'; overlay.innerHTML = ''; });
     } else if (d.type === 'create-playlist-result') {
       // child reports result of playlist creation
       // only react if it matches the pending frame

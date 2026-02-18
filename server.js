@@ -246,6 +246,30 @@ app.delete("/api/playlists/:id/songs", auth, (req, res) => {
   res.json({ ok: true });
 });
 
+// NUEVO: Reordenar canciones en una playlist
+app.put('/api/playlists/:id/order', auth, (req, res) => {
+  const id = Number(req.params.id);
+  const { order } = req.body || {};
+  if (!Array.isArray(order)) return res.status(400).json({ error: 'order debe ser un arreglo de ids' });
+  const own = db.prepare('SELECT 1 FROM playlists WHERE id = ? AND user_id = ?').get(id, req.user.id);
+  if (!own) return res.status(404).json({ error: 'Playlist no encontrada' });
+
+  const tx = db.transaction((ids) => {
+    for (let i = 0; i < ids.length; i++) {
+      const sid = Number(ids[i]);
+      db.prepare('UPDATE playlist_songs SET orden = ? WHERE id = ? AND playlist_id = ?').run(i, sid, id);
+    }
+  });
+
+  try {
+    tx(order);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('reorder error', e);
+    res.status(500).json({ error: 'No se pudo reordenar' });
+  }
+});
+
 // --- Servir Frontend ---
 // Detecta carpeta pública automáticamente: si existe subcarpeta "Trabajo_Integrador" la usa;
 // si no, usa la carpeta actual (útil cuando server.js está dentro del front).

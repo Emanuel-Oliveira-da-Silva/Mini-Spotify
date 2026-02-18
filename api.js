@@ -95,6 +95,11 @@ const api = {
       body: JSON.stringify({ nombre }),
     }),
   clearPl: (id) => apiFetch(`/playlists/${id}/songs`, { method: "DELETE" }),
+  reorderPl: (id, order) =>
+    apiFetch(`/playlists/${id}/order`, {
+      method: "PUT",
+      body: JSON.stringify({ order }),
+    }),
 
   // songs
   addSong: (id, song) =>
